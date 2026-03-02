@@ -1,0 +1,167 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/supabase/:path*",
+      "destination": "https://pyxunqhpzynnhvvwwxpg.supabase.co/:path*"
+    },
+    {
+      "source": "/api/admin/ai/banner-text",
+      "destination": "/api/admin/products?__route=banner-text"
+    },
+    {
+      "source": "/api/admin/home/smart-layout",
+      "destination": "/api/admin/products?__route=smart-layout"
+    },
+    {
+      "source": "/api/email/test",
+      "destination": "/api/admin/products?__route=email-test"
+    },
+    {
+      "source": "/api/shipping/test-create",
+      "destination": "/api/admin/products?__route=shipping-test"
+    },
+    {
+      "source": "/api/social/submissions",
+      "destination": "/api/admin/products?__route=social-submissions-user"
+    },
+    {
+      "source": "/api/admin/social/submissions",
+      "destination": "/api/admin/products?__route=social-submissions-admin"
+    },
+    {
+      "source": "/api/referrals/validate",
+      "destination": "/api/admin/products?__route=referral-validate"
+    },
+    {
+      "source": "/api/referrals/apply",
+      "destination": "/api/admin/products?__route=referral-apply"
+    },
+    {
+      "source": "/api/referrals/remind",
+      "destination": "/api/admin/products?__route=referral-remind"
+    },
+    {
+      "source": "/api/admin/referrals",
+      "destination": "/api/admin/products?__route=admin-referrals"
+    },
+    {
+      "source": "/api/social/recheck/run",
+      "destination": "/api/admin/products?__route=social-recheck-run"
+    },
+    {
+      "source": "/api/social/leaderboard",
+      "destination": "/api/admin/products?__route=social-leaderboard"
+    },
+    {
+      "source": "/api/social/caption/generate",
+      "destination": "/api/admin/products?__route=social-caption-generate"
+    },
+    {
+      "source": "/api/creator/track",
+      "destination": "/api/admin/products?__route=creator-track"
+    },
+    {
+      "source": "/api/creator/dashboard",
+      "destination": "/api/admin/products?__route=creator-dashboard"
+    },
+    {
+      "source": "/api/admin/creator-analytics",
+      "destination": "/api/admin/products?__route=admin-creator-analytics"
+    },
+    {
+      "source": "/api/elite/me",
+      "destination": "/api/admin/products?__route=elite-me"
+    },
+    {
+      "source": "/api/admin/elite",
+      "destination": "/api/admin/products?__route=admin-elite"
+    },
+    {
+      "source": "/api/admin/royal/system",
+      "destination": "/api/admin/products?__route=admin-royal-system"
+    },
+    {
+      "source": "/api/admin/content-blocks",
+      "destination": "/api/admin/products?__route=admin-content-blocks"
+    },
+    {
+      "source": "/api/royal-access/order",
+      "destination": "/api/admin/products?__route=royal-access-order"
+    },
+    {
+      "source": "/api/royal-access/verify",
+      "destination": "/api/admin/products?__route=royal-access-verify"
+    },
+    {
+      "source": "/api/admin/drops/create",
+      "destination": "/api/admin/products?__route=admin-drops-create"
+    },
+    {
+      "source": "/api/admin/drops/update",
+      "destination": "/api/admin/products?__route=admin-drops-update"
+    },
+    {
+      "source": "/api/drops/active",
+      "destination": "/api/admin/products?__route=drops-active"
+    },
+    {
+      "source": "/api/drops/:id/products",
+      "destination": "/api/admin/products?__route=drop-products&id=:id"
+    },
+    {
+      "source": "/api/drops/:id/access-request",
+      "destination": "/api/admin/products?__route=drop-access-request&id=:id"
+    },
+    {
+      "source": "/api/drops/:id/redeem",
+      "destination": "/api/admin/products?__route=drop-redeem&id=:id"
+    },
+    {
+      "source": "/api/drops/:id",
+      "destination": "/api/admin/products?__route=drop-read&id=:id"
+    },
+    {
+      "source": "/api/homepage/variant",
+      "destination": "/api/admin/products?__route=homepage-variant"
+    },
+    {
+      "source": "/api/homepage/mobile",
+      "destination": "/api/admin/products?__route=homepage-mobile"
+    },
+    {
+      "source": "/api/homepage/interaction",
+      "destination": "/api/admin/products?__route=homepage-interaction"
+    },
+    {
+      "source": "/api/admin/discount-codes",
+      "destination": "/api/admin/products?__route=admin-discount-codes"
+    },
+    {
+      "source": "/api/discount-codes/validate",
+      "destination": "/api/admin/products?__route=discount-code-validate"
+    },
+    {
+      "source": "/api/webhooks/shiprocket",
+      "destination": "/api/webhooks/shipping"
+    },
+    {
+      "source": "/api/hooks/tracking",
+      "destination": "/api/webhooks/shipping"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/"
+    }
+  ]
+}

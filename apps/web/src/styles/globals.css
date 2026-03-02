@@ -1,0 +1,76 @@
+/* ZARELON LUXURY GLOBAL STYLES */
+
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400;500&display=swap");
+
+:root {
+  --bg-black: #111111;
+  --bg-soft: #f8f8f6;
+  --gold-primary: #c8a951;
+  --gold-gradient: linear-gradient(135deg, #111111, #2d2d2d);
+  --text-light: #111111;
+  --text-muted: #646464;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #ffffff;
+  color: #111111;
+  font-family: "Inter", sans-serif;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Cormorant Garamond", serif;
+  letter-spacing: 1px;
+}
+
+.container {
+  width: 90%;
+  max-width: 1300px;
+  margin: auto;
+}
+
+.gold-text {
+  color: #111111;
+}
+
+.gold-button {
+  background: #111111;
+  color: #fff;
+  padding: 12px 28px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.gold-button:hover {
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: #c8a951;
+  color: #111111;
+}
+
+.card {
+  background: var(--bg-soft);
+  padding: 20px;
+  transition: 0.4s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.hero-title {
+  margin-top: clamp(56px, 10vh, 100px);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.15;
+}
