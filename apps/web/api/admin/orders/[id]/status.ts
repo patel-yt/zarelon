@@ -132,7 +132,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return sendError(res, 400, shipmentSyncError.message || "Order updated but shipment status sync failed");
   }
 
-  if (parsed.data.status === "shipped" && order.status !== "shipped") {
+  if ((parsed.data.status === "confirmed" || parsed.data.status === "shipped") && order.status !== parsed.data.status) {
     const shippingAddress = ((order as any).shipping_address ?? {}) as Record<string, unknown>;
     const deliveryLane = String(shippingAddress.deliveryLane ?? "").toLowerCase();
     const royalPriorityDelivery =
@@ -149,6 +149,14 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       | "refunded";
     const rollbackTrackingStatus = toTrackingStatus(rollbackOrderStatus);
     try {
+      const existingShipment = await adminClient
+        .from("shipments")
+        .select("id,tracking_number")
+        .eq("order_id", orderId)
+        .maybeSingle();
+      if (!existingShipment.error && existingShipment.data?.tracking_number) {
+        shiprocketSync = { attempted: true, success: true };
+      } else {
       const itemsRes = await adminClient
         .from("order_items")
         .select("title_snapshot,quantity,price_inr,product_id")
@@ -180,8 +188,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
           carrier_name: sr.carrierName || "Shiprocket",
           tracking_number: sr.trackingNumber || sr.awbNumber || sr.shipmentId,
           awb_number: sr.awbNumber || null,
-          carrier_status: "shipped",
-          normalized_status: "shipped",
+          carrier_status: parsed.data.status,
+          normalized_status: parsed.data.status === "confirmed" ? "packed" : "shipped",
           eta: etaDate,
           tracking_url: sr.trackingUrl || null,
           last_event_at: new Date().toISOString(),
@@ -191,7 +199,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
       await adminClient.from("payments_audit").insert({
         order_id: orderId,
-        event_type: "shiprocket_forward_order_created",
+        event_type: parsed.data.status === "confirmed" ? "shiprocket_forward_order_confirmed" : "shiprocket_forward_order_created",
         provider_payload: {
           shiprocket_order_id: sr.shiprocketOrderId || null,
           shipment_id: sr.shipmentId || null,
@@ -202,6 +210,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         },
       });
       shiprocketSync = { attempted: true, success: true };
+      }
     } catch (shiprocketError) {
       const reason = shiprocketError instanceof Error ? shiprocketError.message : "Shiprocket create failed";
       await adminClient.from("payments_audit").insert({

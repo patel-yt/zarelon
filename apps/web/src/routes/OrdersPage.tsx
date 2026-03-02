@@ -139,6 +139,15 @@ export const OrdersPage = () => {
     queryFn: () => fetchOrders(user!.id),
     enabled: Boolean(user?.id),
   });
+  const trackingSyncQuery = useQuery({
+    queryKey: ["orders-tracking-sync", user?.id],
+    queryFn: () => ordersApi.syncTracking(),
+    enabled: Boolean(user?.id),
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
+    staleTime: 30_000,
+    retry: 0,
+  });
   const eliteQuery = useQuery({
     queryKey: ["elite-me-orders", user?.id],
     queryFn: eliteApi.getMyStatus,
@@ -280,6 +289,14 @@ export const OrdersPage = () => {
       setReturnError((error as Error).message ?? "Could not submit request.");
     },
   });
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const updated = Number(trackingSyncQuery.data?.updated ?? 0);
+    if (updated > 0) {
+      void queryClient.invalidateQueries({ queryKey: ["orders", user.id] });
+    }
+  }, [trackingSyncQuery.data?.updated, queryClient, user?.id]);
 
   const daysLeftForItem = (order: any, item: any) => {
     const windowDays = Math.max(1, Math.min(30, item?.product?.return_window_days ?? 7));

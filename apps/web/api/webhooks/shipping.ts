@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "../_lib/email.js";
 import { handleReturnPickupWebhook } from "../_lib/returns.js";
+import { fetchShiprocketTracking } from "../_lib/shiprocket.js";
 
 declare const process: {
   env: Record<string, string | undefined>;
@@ -212,6 +213,94 @@ const runAbandonedCartSweep = async () => {
   return { ok: true, firstSent, secondSent };
 };
 
+const runShiprocketTrackingSync = async () => {
+  const rowsRes = await adminClient
+    .from("shipments")
+    .select("id,order_id,carrier_name,tracking_number,carrier_status,normalized_status,last_event_at")
+    .ilike("carrier_name", "%shiprocket%")
+    .limit(200);
+
+  if (rowsRes.error) throw new Error(rowsRes.error.message || "Could not load shipments for Shiprocket sync");
+
+  const rows = (rowsRes.data ?? []) as Array<{
+    id: string;
+    order_id: string;
+    carrier_name: string | null;
+    tracking_number: string | null;
+    carrier_status: string | null;
+    normalized_status: TrackingStatus | null;
+    last_event_at: string | null;
+  }>;
+
+  let updated = 0;
+  let skipped = 0;
+  let failed = 0;
+
+  for (const row of rows) {
+    const trackingNumber = String(row.tracking_number ?? "").trim();
+    if (!trackingNumber) {
+      skipped += 1;
+      continue;
+    }
+
+    try {
+      const live = await fetchShiprocketTracking(trackingNumber);
+      if (!live) {
+        skipped += 1;
+        continue;
+      }
+
+      const lastTs = row.last_event_at ? new Date(row.last_event_at).getTime() : 0;
+      const nextTs = live.eventTime ? new Date(live.eventTime).getTime() : Date.now();
+      const unchanged =
+        String(row.carrier_status ?? "") === String(live.carrierStatus ?? "") &&
+        String(row.normalized_status ?? "") === String(live.normalizedStatus ?? "") &&
+        nextTs <= lastTs;
+      if (unchanged) {
+        skipped += 1;
+        continue;
+      }
+
+      const normalizedStatus = normalizeTrackingStatus(live.carrierStatus ?? String(live.normalizedStatus ?? "shipped"));
+      const mappedOrderStatus = mapTrackingToOrderStatus(normalizedStatus);
+
+      const updateShipment = await adminClient
+        .from("shipments")
+        .update({
+          carrier_name: live.carrierName ?? row.carrier_name ?? "Shiprocket",
+          carrier_status: live.carrierStatus ?? String(normalizedStatus),
+          normalized_status: normalizedStatus,
+          eta: live.eta ?? null,
+          tracking_url: live.trackingUrl ?? null,
+          awb_number: live.awbNumber ?? null,
+          last_event_at: live.eventTime ?? new Date().toISOString(),
+        })
+        .eq("id", row.id);
+      if (updateShipment.error) throw new Error(updateShipment.error.message || "Could not update shipment");
+
+      await adminClient.from("shipment_events").insert({
+        shipment_id: row.id,
+        raw_status: live.carrierStatus ?? String(normalizedStatus),
+        normalized_status: normalizedStatus,
+        location: live.location ?? null,
+        raw_payload: { source: "shiprocket_sync_job", tracking_number: trackingNumber },
+        event_time: live.eventTime ?? new Date().toISOString(),
+      });
+
+      await adminClient
+        .from("orders")
+        .update({ status: mappedOrderStatus, updated_at: new Date().toISOString() })
+        .eq("id", row.order_id);
+
+      updated += 1;
+    } catch {
+      failed += 1;
+    }
+  }
+
+  return { ok: true, total: rows.length, updated, skipped, failed };
+};
+
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
     const task = Array.isArray(req.query?.task) ? req.query?.task[0] : req.query?.task;
@@ -227,6 +316,21 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         res.status(200).json({ success: true, job: "abandoned-carts" });
       } catch (error) {
         const message = error instanceof Error ? error.message : "abandoned_cart_sweep_failed";
+        res.status(500).json({ success: false, error: message });
+      }
+      return;
+    }
+
+    if (task === "sync-shiprocket") {
+      if (token !== serverEnv.automationCronSecret) {
+        res.status(401).json({ error: "Unauthorized cron request" });
+        return;
+      }
+      try {
+        const result = await runShiprocketTrackingSync();
+        res.status(200).json({ success: true, job: "sync-shiprocket", ...result });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "shiprocket_sync_failed";
         res.status(500).json({ success: false, error: message });
       }
       return;

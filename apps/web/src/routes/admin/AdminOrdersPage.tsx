@@ -471,14 +471,14 @@ export const AdminOrdersPage = () => {
                   onClick={() =>
                     statusMutation.mutate({
                       orderId: order.id,
-                      status: "shipped",
-                      reason: "Royal priority approved for fast delivery",
+                      status: "confirmed",
+                      reason: "Royal priority approved and sent to Shiprocket",
                       paymentStatus: order.payment_status,
                     })
                   }
                   disabled={statusUpdatingOrderId === order.id}
                 >
-                  {statusUpdatingOrderId === order.id ? "Approving..." : "Approve + Fast Ship"}
+                  {statusUpdatingOrderId === order.id ? "Approving..." : "Approve + Create Shipment"}
                 </Button>
               ) : null}
               {String(order.payment_provider ?? "").toLowerCase() === "razorpay" &&

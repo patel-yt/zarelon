@@ -213,6 +213,14 @@ export const ordersApi = {
     });
     return parse<{ success: boolean; requestId: string; status: string }>(res);
   },
+  syncTracking: async () => {
+    const res = await authedFetch("/api/orders/sync-tracking", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    return parse<{ ok: boolean; updated: number; skipped: number; failed: number }>(res);
+  },
 };
 
 export const discountCodeApi = {
