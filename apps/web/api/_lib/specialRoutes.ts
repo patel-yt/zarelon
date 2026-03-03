@@ -1426,16 +1426,35 @@ export async function handleCreatorDashboard(req: ApiRequest, res: ApiResponse) 
     .eq("user_id", user.id);
   if (submissionsRes.error) return sendError(res, 400, submissionsRes.error.message);
   const totalSubmissions = (submissionsRes.data ?? []).length;
-  const earnedCoupons = (submissionsRes.data ?? []).filter((row: any) => row.coupon_generated && row.coupon_code);
   const referralsRes = await adminClient
     .from("referrals")
     .select(
-      "id,referred_user_id,purchase_amount,reward_given,created_at,friend:users!referrals_referred_user_id_fkey(id,name,email)"
+      "id,referred_user_id,purchase_amount,reward_given,created_at,friend_coupon_code,friend_coupon_expires_at,referrer_coupon_code,referrer_coupon_expires_at,friend:users!referrals_referred_user_id_fkey(id,name,email)"
     )
     .eq("referrer_id", user.id)
     .order("created_at", { ascending: false })
     .limit(100);
   if (referralsRes.error) return sendError(res, 400, referralsRes.error.message);
+  const socialCoupons = (submissionsRes.data ?? [])
+    .filter((row: any) => row.coupon_generated && row.coupon_code)
+    .map((row: any) => ({
+      id: String(row.id),
+      coupon_code: String(row.coupon_code),
+      coupon_expires_at: row.coupon_expires_at ?? null,
+    }));
+  const referralCoupons = (referralsRes.data ?? [])
+    .filter((row: any) => row.reward_given && row.referrer_coupon_code)
+    .map((row: any) => ({
+      id: `ref-${String(row.id)}`,
+      coupon_code: String(row.referrer_coupon_code),
+      coupon_expires_at: row.referrer_coupon_expires_at ?? null,
+    }));
+  const couponSeen = new Set<string>();
+  const earnedCoupons = [...socialCoupons, ...referralCoupons].filter((coupon) => {
+    if (couponSeen.has(coupon.coupon_code)) return false;
+    couponSeen.add(coupon.coupon_code);
+    return true;
+  });
 
   const tiersRes = await adminClient
     .from("creator_tiers")
@@ -1477,17 +1496,21 @@ export async function handleCreatorDashboard(req: ApiRequest, res: ApiResponse) 
         views_percent: viewsProgress,
       },
       earned_coupons: earnedCoupons,
-      referrals: (referralsRes.data ?? []).map((row: any) => ({
-        id: row.id,
-        referred_user_id: row.referred_user_id,
-        purchase_amount: row.purchase_amount,
-        reward_given: Boolean(row.reward_given),
-        created_at: row.created_at,
-        friend: {
-          id: (Array.isArray(row.friend) ? row.friend[0] : row.friend)?.id ?? row.referred_user_id,
-          name: (Array.isArray(row.friend) ? row.friend[0] : row.friend)?.name ?? "New user",
-          email: (Array.isArray(row.friend) ? row.friend[0] : row.friend)?.email ?? null,
-        },
+        referrals: (referralsRes.data ?? []).map((row: any) => ({
+          id: row.id,
+          referred_user_id: row.referred_user_id,
+          purchase_amount: row.purchase_amount,
+          reward_given: Boolean(row.reward_given),
+          created_at: row.created_at,
+          friend_coupon_code: row.friend_coupon_code ?? null,
+          friend_coupon_expires_at: row.friend_coupon_expires_at ?? null,
+          referrer_coupon_code: row.referrer_coupon_code ?? null,
+          referrer_coupon_expires_at: row.referrer_coupon_expires_at ?? null,
+          friend: {
+            id: (Array.isArray(row.friend) ? row.friend[0] : row.friend)?.id ?? row.referred_user_id,
+            name: (Array.isArray(row.friend) ? row.friend[0] : row.friend)?.name ?? "New user",
+            email: (Array.isArray(row.friend) ? row.friend[0] : row.friend)?.email ?? null,
+          },
       })),
     },
   });

@@ -213,6 +213,16 @@ export const CreatorDashboardPage = () => {
                 <p className="font-medium">{row.friend?.name ?? "New user"}</p>
                 <p className="text-xs text-[#666666]">{row.friend?.email ?? "-"}</p>
                 <p className="text-xs text-[#666666]">Joined {new Date(row.created_at).toLocaleDateString()}</p>
+                {row.reward_given && row.referrer_coupon_code ? (
+                  <p className="mt-1 text-xs font-semibold text-[#1f1a12]">
+                    Coupon: {row.referrer_coupon_code}
+                    {row.referrer_coupon_expires_at ? (
+                      <span className="ml-1 font-normal text-[#666666]">
+                        (valid till {new Date(row.referrer_coupon_expires_at).toLocaleDateString()})
+                      </span>
+                    ) : null}
+                  </p>
+                ) : null}
               </div>
               {row.reward_given ? (
                 <span className="rounded-full border border-emerald-300 bg-emerald-50 px-2 py-1 text-xs text-emerald-700">Converted</span>

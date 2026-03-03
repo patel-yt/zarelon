@@ -1125,6 +1125,10 @@ export const creatorApi = {
           purchase_amount: number | null;
           reward_given: boolean;
           created_at: string;
+          friend_coupon_code?: string | null;
+          friend_coupon_expires_at?: string | null;
+          referrer_coupon_code?: string | null;
+          referrer_coupon_expires_at?: string | null;
           friend: { id: string; name: string | null; email: string | null };
         }>;
       };

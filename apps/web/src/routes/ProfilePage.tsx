@@ -58,6 +58,43 @@ export const ProfilePage = () => {
     queryFn: eliteApi.getMyStatus,
     staleTime: 30_000,
   });
+  const referralCouponsQuery = useQuery({
+    queryKey: ["referral-coupons", user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("referrals")
+        .select(
+          "id,referrer_id,referred_user_id,reward_given,created_at,friend_coupon_code,friend_coupon_expires_at,referrer_coupon_code,referrer_coupon_expires_at"
+        )
+        .or(`referrer_id.eq.${user.id},referred_user_id.eq.${user.id}`)
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error && !String(error.message ?? "").toLowerCase().includes("referrals")) throw error;
+      return (data ?? []).flatMap((row: any) => {
+        if (!row.reward_given) return [];
+        const coupons: Array<{ id: string; role: "friend" | "referrer"; code: string; expiresAt: string | null; createdAt: string }> = [];
+        if (row.referred_user_id === user.id && row.friend_coupon_code) {
+          coupons.push({
+            id: `friend-${row.id}`,
+            role: "friend",
+            code: String(row.friend_coupon_code),
+            expiresAt: row.friend_coupon_expires_at ?? null,
+            createdAt: row.created_at,
+          });
+        }
+        if (row.referrer_id === user.id && row.referrer_coupon_code) {
+          coupons.push({
+            id: `referrer-${row.id}`,
+            role: "referrer",
+            code: String(row.referrer_coupon_code),
+            expiresAt: row.referrer_coupon_expires_at ?? null,
+            createdAt: row.created_at,
+          });
+        }
+        return coupons;
+      });
+    },
+  });
 
   useEffect(() => {
     const payout = payoutQuery.data;
@@ -174,6 +211,31 @@ export const ProfilePage = () => {
       >
         Refresh Profile Sync
       </Button>
+      </div>
+      <div className={profileLuxeCardClass}>
+        <h2 className="font-heading text-2xl text-[#111111]">My Referral Coupons</h2>
+        <p className="mt-1 text-xs text-[#666666]">Referral complete hone par coupon yahin auto show hoga.</p>
+        <div className="mt-4 grid gap-2">
+          {(referralCouponsQuery.data ?? []).map((coupon) => {
+            const isExpired = coupon.expiresAt ? new Date(coupon.expiresAt).getTime() < Date.now() : false;
+            return (
+              <div key={coupon.id} className="rounded-xl border border-[#d8c28e] bg-[#fffdfa] px-3 py-2 text-sm">
+                <p className="font-semibold text-[#1f170b]">{coupon.code}</p>
+                <p className="text-xs text-[#666666]">
+                  {coupon.role === "referrer" ? "Referral reward (you referred someone)" : "Friend reward (you used referral code)"}
+                </p>
+                {coupon.expiresAt ? (
+                  <p className={`text-xs ${isExpired ? "text-rose-600" : "text-[#666666]"}`}>
+                    Valid till {new Date(coupon.expiresAt).toLocaleDateString()} {isExpired ? "(Expired)" : ""}
+                  </p>
+                ) : null}
+              </div>
+            );
+          })}
+          {referralCouponsQuery.isFetched && !(referralCouponsQuery.data?.length ?? 0) ? (
+            <p className="text-sm text-[#666666]">Abhi koi referral coupon nahi hai.</p>
+          ) : null}
+        </div>
       </div>
       <div className={profileLuxeCardClass}>
         <h2 className="font-heading text-2xl text-[#111111]">Refund Payout Details</h2>
