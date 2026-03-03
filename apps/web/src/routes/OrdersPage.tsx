@@ -431,7 +431,7 @@ export const OrdersPage = () => {
   if (!user) return <div>Please sign in to view orders.</div>;
 
   return (
-    <div className="space-y-5 rounded-2xl border border-zinc-300/80 bg-white p-4 text-zinc-900 sm:p-6">
+    <div className="space-y-5 rounded-2xl border border-zinc-300/80 bg-[#f8f7f3] p-4 text-zinc-900 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-heading text-3xl text-zinc-900 sm:text-4xl">Order History</h1>
@@ -450,7 +450,7 @@ export const OrdersPage = () => {
       {(query.data ?? []).map((order) => (
         <div
           key={order.id}
-          className="rounded-2xl border border-white/12 bg-[linear-gradient(160deg,rgba(26,26,26,0.98),rgba(10,10,10,0.98))] p-4 text-white shadow-[0_18px_50px_rgba(0,0,0,0.45)] backdrop-blur-sm sm:p-5"
+          className="rounded-2xl border border-zinc-300 bg-white p-4 text-zinc-900 shadow-[0_12px_24px_rgba(0,0,0,0.08)] sm:p-5"
         >
           {(() => {
             const delivery = getDeliveryCommitment(order);
@@ -468,15 +468,15 @@ export const OrdersPage = () => {
               </div>
             );
           })()}
-          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 pb-3">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-zinc-200 pb-3">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.15em] text-white/45">Order ID</p>
+              <p className="text-[11px] uppercase tracking-[0.15em] text-zinc-500">Order ID</p>
               <p className="font-heading text-lg text-gold-100">#{order.order_number}</p>
-              <p className="mt-1 text-xs text-white/55">{new Date(order.created_at).toLocaleString()}</p>
+              <p className="mt-1 text-xs text-zinc-600">{new Date(order.created_at).toLocaleString()}</p>
             </div>
             <div className="ml-auto flex flex-wrap items-center justify-end gap-2 text-right">
-              <p className="text-[11px] uppercase tracking-[0.15em] text-white/45">Order Value</p>
-              <p className="min-w-[130px] text-right font-heading text-xl text-white">
+              <p className="text-[11px] uppercase tracking-[0.15em] text-zinc-500">Order Value</p>
+              <p className="min-w-[130px] text-right font-heading text-xl text-zinc-900">
                 {currencyQuery.data ? formatCurrencyAmount(order.total_inr, currencyQuery.data) : formatINR(order.total_inr)}
               </p>
             </div>
