@@ -37,6 +37,11 @@ type ShiprocketCreateOrderResponse = {
   errors?: unknown;
 };
 
+type ShiprocketPickupLocation = {
+  pickup_location?: string;
+  status?: number;
+};
+
 let cachedToken: { value: string; expiresAt: number } | null = null;
 
 const SHIPROCKET_BASE = "https://apiv2.shiprocket.in/v1/external";
@@ -205,7 +210,7 @@ export const createShiprocketForwardOrder = async (input: CreateShiprocketForwar
     hsn: 111111,
   }));
 
-  const payload = {
+  const buildPayload = (pickupLocation: string) => ({
     order_id: input.orderNumber || `ORD-${input.orderId.slice(0, 8).toUpperCase()}`,
     order_date: orderDate,
     pickup_location: pickupLocation,
@@ -245,18 +250,39 @@ export const createShiprocketForwardOrder = async (input: CreateShiprocketForwar
     breadth: 10,
     height: 10,
     weight: 0.7,
-  };
-
-  const response = await fetch(`${SHIPROCKET_BASE}/orders/create/adhoc`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
   });
 
-  const json = (await safeJson(response)) as ShiprocketCreateOrderResponse;
+  const callCreateOrder = async (payload: Record<string, unknown>) => {
+    const response = await fetch(`${SHIPROCKET_BASE}/orders/create/adhoc`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const json = (await safeJson(response)) as ShiprocketCreateOrderResponse;
+    return { response, json };
+  };
+
+  let payload = buildPayload(pickupLocation);
+  let { response, json } = await callCreateOrder(payload);
+  const message = toCleanString((json as unknown as Record<string, unknown>).message);
+  if (response.ok && /wrong pickup location/i.test(message)) {
+    const root = json as unknown as Record<string, unknown>;
+    const dataNode =
+      root.data && typeof root.data === "object" && !Array.isArray(root.data) ? (root.data as Record<string, unknown>) : {};
+    const list = Array.isArray(dataNode.data) ? (dataNode.data as ShiprocketPickupLocation[]) : [];
+    const activePickup = list.find((item) => Number(item.status ?? 0) === 1 && toCleanString(item.pickup_location));
+    if (activePickup?.pickup_location) {
+      payload = buildPayload(String(activePickup.pickup_location));
+      const retry = await callCreateOrder(payload);
+      response = retry.response;
+      json = retry.json;
+    }
+  }
+
   if (!response.ok) {
     const reason = typeof json.message === "string" ? json.message : "Shiprocket create order failed";
     throw new Error(reason);
@@ -285,8 +311,8 @@ export const createShiprocketForwardOrder = async (input: CreateShiprocketForwar
 
   if (!isAccepted || (!shiprocketOrderId && !shipmentId && !awbNumber && !trackingNumber)) {
     const errorBits: string[] = [];
-    const message = toCleanString(root.message);
-    if (message) errorBits.push(message);
+    const finalMessage = toCleanString(root.message);
+    if (finalMessage) errorBits.push(finalMessage);
     if (root.errors !== undefined) {
       try {
         errorBits.push(`errors=${JSON.stringify(root.errors)}`);
