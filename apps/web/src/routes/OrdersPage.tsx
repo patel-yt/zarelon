@@ -509,11 +509,11 @@ export const OrdersPage = () => {
             ) : null}
           </div>
           <div className="mt-3">
-            <div className="flex flex-wrap gap-2">
+            <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:flex-wrap">
               {(order.status === "pending" || order.status === "confirmed") && (
                 <Button
                   variant="ghost"
-                  className="rounded-full border border-rose-400/35 bg-rose-500/10 px-4 py-1.5 text-xs text-rose-200"
+                  className="w-full rounded-full border border-rose-400/35 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 sm:w-auto"
                   onClick={async () => {
                     const reason = window.prompt("Reason for cancellation (optional):")?.trim() || undefined;
                     try {
@@ -535,7 +535,7 @@ export const OrdersPage = () => {
                 </Button>
               )}
               {order.status !== "pending" && order.status !== "confirmed" && (
-                <Button variant="ghost" className="rounded-full border border-zinc-300 bg-zinc-100 px-4 py-1.5 text-xs text-zinc-600" disabled>
+                <Button variant="ghost" className="w-full rounded-full border border-zinc-300 bg-zinc-100 px-4 py-2 text-xs text-zinc-600 sm:w-auto" disabled>
                   Cancel Unavailable (After Shipping)
                 </Button>
               )}
@@ -546,7 +546,7 @@ export const OrdersPage = () => {
               order.refund_status !== "refunded" ? (
                 <Button
                   variant="ghost"
-                  className="rounded-full border border-emerald-400/35 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-200"
+                  className="w-full rounded-full border border-emerald-400/35 bg-emerald-500/10 px-4 py-2 text-xs text-emerald-200 sm:w-auto"
                   disabled={refundRequestMutation.isPending || payoutQuery.isLoading}
                   onClick={() => requestRefundFlow(order)}
                 >
@@ -591,7 +591,7 @@ export const OrdersPage = () => {
                       ) : null}
                         </div>
                       </div>
-                      <div className="mt-2 flex flex-wrap gap-2">
+                      <div className="mt-2 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
                         {refundCompleted ? (
                           <span className="rounded-full border border-emerald-400/35 bg-emerald-500/10 px-2 py-0.5 text-[11px] text-emerald-200">
                             Refund Completed
@@ -625,7 +625,7 @@ export const OrdersPage = () => {
                         {isItemEligibleForAction(order, item, "RETURN") ? (
                           <Button
                             variant="ghost"
-                            className="px-2 py-1 text-xs"
+                            className="w-full px-2 py-1.5 text-xs sm:w-auto"
                             onClick={() => {
                               setReturnModalOrderId(order.id);
                               setReturnModalItemId(item.id);
@@ -643,7 +643,7 @@ export const OrdersPage = () => {
                         {isItemEligibleForAction(order, item, "EXCHANGE") ? (
                           <Button
                             variant="ghost"
-                            className="px-2 py-1 text-xs"
+                            className="w-full px-2 py-1.5 text-xs sm:w-auto"
                             onClick={() => {
                               setReturnModalOrderId(order.id);
                               setReturnModalItemId(item.id);
@@ -722,7 +722,7 @@ export const OrdersPage = () => {
               return (
                 <div className="mt-4 rounded-lg border border-rose-400/25 bg-rose-500/5 p-3 text-center">
                   <p className="mb-3 text-xs uppercase tracking-wider text-rose-200">Order Progress</p>
-                  <div className="mx-auto flex w-full max-w-xl items-center gap-3">
+                  <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-2 sm:flex-row sm:gap-3">
                     <div className="flex items-center gap-2">
                       <div className="h-2.5 w-2.5 rounded-full bg-amber-300" />
                       <p className="text-xs text-amber-100">Order Placed</p>
@@ -733,7 +733,7 @@ export const OrdersPage = () => {
                       <p className="text-xs text-rose-200">Cancelled</p>
                     </div>
                   </div>
-                  <div className="mx-auto mt-3 grid max-w-xl gap-2 sm:grid-cols-3">
+                  <div className="mx-auto mt-3 grid w-full max-w-xl grid-cols-1 gap-2 sm:grid-cols-3">
                     {statusSteps.map((step, index) => {
                       const done = index <= currentCancelStep;
                       return (
@@ -756,7 +756,7 @@ export const OrdersPage = () => {
               return (
                 <div className="mt-4 rounded-lg border border-emerald-400/25 bg-emerald-500/5 p-3 text-center">
                   <p className="mb-3 text-xs uppercase tracking-wider text-emerald-200">Order Progress</p>
-                  <div className="mx-auto flex w-full max-w-xl items-center gap-3">
+                  <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-2 sm:flex-row sm:gap-3">
                     <div className="flex items-center gap-2">
                       <div className="h-2.5 w-2.5 rounded-full bg-amber-300" />
                       <p className="text-xs text-amber-100">Order Placed</p>
@@ -767,7 +767,7 @@ export const OrdersPage = () => {
                       <p className="text-xs text-emerald-200">Refunded</p>
                     </div>
                   </div>
-                  <div className="mx-auto mt-3 grid max-w-xl gap-2 sm:grid-cols-3">
+                  <div className="mx-auto mt-3 grid w-full max-w-xl grid-cols-1 gap-2 sm:grid-cols-3">
                     {statusSteps.map((step, index) => {
                       const done = index <= refundStep;
                       const label = step === "requested" ? "Refund Requested" : step === "processed" ? "Refund Processed" : "Refund Completed";
@@ -789,7 +789,7 @@ export const OrdersPage = () => {
               return (
                 <div className="mt-4 rounded-lg border border-emerald-400/25 bg-emerald-500/5 p-3 text-center">
                   <p className="mb-3 text-xs uppercase tracking-wider text-emerald-200">Order Progress</p>
-                  <div className="mx-auto flex w-full max-w-xl items-center gap-3">
+                  <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-2 sm:flex-row sm:gap-3">
                     <div className="flex items-center gap-2">
                       <div className="h-2.5 w-2.5 rounded-full bg-amber-300" />
                       <p className="text-xs text-amber-100">Order Placed</p>
@@ -800,7 +800,7 @@ export const OrdersPage = () => {
                       <p className="text-xs text-emerald-200">Refund Flow</p>
                     </div>
                   </div>
-                  <div className="mx-auto mt-3 grid max-w-xl gap-2 sm:grid-cols-3">
+                  <div className="mx-auto mt-3 grid w-full max-w-xl grid-cols-1 gap-2 sm:grid-cols-3">
                     <p className="text-[11px] uppercase text-emerald-200">Refund Requested</p>
                     <p className="text-[11px] uppercase text-white/45">Refund Processed</p>
                     <p className="text-[11px] uppercase text-white/45">Refund Completed</p>
@@ -830,7 +830,7 @@ export const OrdersPage = () => {
             return (
               <div className={`mt-4 rounded-xl border p-3 text-center ${isRoyal ? "border-gold-400/45 bg-[#17150f]" : "border-zinc-200 bg-white"}`}>
                 <p className={`mb-3 text-xs uppercase tracking-wider ${isRoyal ? "text-white/65" : "text-zinc-600"}`}>Order Progress</p>
-                <div className="mx-auto grid max-w-3xl gap-2 sm:grid-cols-5">
+                <div className="mx-auto grid w-full max-w-3xl grid-cols-2 gap-2 sm:grid-cols-5">
                   {timeline.map((step, index) => {
                     const done = index <= clampedStep;
                     return (
