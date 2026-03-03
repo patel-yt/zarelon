@@ -492,33 +492,45 @@ export const OrdersPage = () => {
               </p>
             </div>
           </div>
-          <div className="mt-2 flex justify-end">
-            <Button
-              variant="ghost"
-              className={`rounded-full px-3 py-1.5 text-xs ${isRoyal ? "border border-gold-400/50 bg-gold-500/10 text-gold-700" : "border border-zinc-300 bg-zinc-100 text-zinc-700"}`}
-              onClick={() => setDetailsOrderId((current) => (current === order.id ? null : order.id))}
-            >
-              {detailsOrderId === order.id ? "Hide Details" : "View Details"}
-            </Button>
-          </div>
-          {detailsOrderId === order.id ? (
-            <div className={`mt-2 rounded-lg border p-3 text-xs ${isRoyal ? "border-gold-400/60 bg-[#fff8e3]" : "border-zinc-300 bg-zinc-50"}`}>
-              <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
-                <p className="text-zinc-700">
-                  Payment Method: <span className="font-semibold text-zinc-900">{getPaymentMethodLabel(order)}</span>
-                </p>
-                <p className="text-zinc-700">
-                  Payment Status: <span className="font-semibold text-zinc-900">{String(order.payment_status ?? "pending").toUpperCase()}</span>
-                </p>
-                <p className="text-zinc-700">
-                  Order Number: <span className="font-semibold text-zinc-900">#{order.order_number}</span>
-                </p>
-                <p className="text-zinc-700">
-                  Reference: <span className="font-semibold text-zinc-900">{order.payment_ref || "Not available"}</span>
-                </p>
-              </div>
+          <button
+            type="button"
+            className={`mt-3 flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left ${
+              isRoyal ? "border-gold-400/60 bg-[#fff8e3]" : "border-zinc-300 bg-zinc-50"
+            }`}
+            onClick={() => setDetailsOrderId((current) => (current === order.id ? null : order.id))}
+          >
+            <div>
+              <p className="text-sm font-semibold text-zinc-900">
+                {order.status === "cancelled" || order.status === "refunded" || order.status === "delivered"
+                  ? orderLabel[order.status] ?? order.status
+                  : order.shipments?.[0]
+                  ? trackingLabel[order.shipments[0].normalized_status] ?? order.shipments[0].normalized_status
+                  : orderLabel[order.status] ?? order.status}
+              </p>
+              <p className="text-xs text-zinc-600">
+                {order.order_items?.[0]?.title_snapshot ?? "Tap to view full order details"}
+              </p>
             </div>
-          ) : null}
+            <span className="text-lg text-zinc-700">{detailsOrderId === order.id ? "▾" : "▸"}</span>
+          </button>
+          {detailsOrderId === order.id ? (
+            <>
+          <div className={`mt-2 rounded-lg border p-3 text-xs ${isRoyal ? "border-gold-400/60 bg-[#fff8e3]" : "border-zinc-300 bg-zinc-50"}`}>
+            <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
+              <p className="text-zinc-700">
+                Payment Method: <span className="font-semibold text-zinc-900">{getPaymentMethodLabel(order)}</span>
+              </p>
+              <p className="text-zinc-700">
+                Payment Status: <span className="font-semibold text-zinc-900">{String(order.payment_status ?? "pending").toUpperCase()}</span>
+              </p>
+              <p className="text-zinc-700">
+                Order Number: <span className="font-semibold text-zinc-900">#{order.order_number}</span>
+              </p>
+              <p className="text-zinc-700">
+                Reference: <span className="font-semibold text-zinc-900">{order.payment_ref || "Not available"}</span>
+              </p>
+            </div>
+          </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <p className="rounded-full border border-gold-400/40 bg-gold-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gold-200">
               {order.status === "cancelled" || order.status === "refunded" || order.status === "delivered"
@@ -956,6 +968,8 @@ export const OrdersPage = () => {
               Courier not assigned yet. Status will update automatically after dispatch.
             </p>
           )}
+            </>
+          ) : null}
         </div>
       );
       })}
