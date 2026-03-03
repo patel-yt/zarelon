@@ -216,6 +216,8 @@ export interface Order {
   total_amount: number | null;
   status: OrderStatus;
   payment_status: PaymentStatus;
+  payment_provider?: string | null;
+  payment_ref?: string | null;
   refund_status: string | null;
   cancel_status: string | null;
   created_at: string;

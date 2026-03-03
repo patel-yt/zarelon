@@ -111,6 +111,14 @@ const getDeliveryCommitment = (order: any): { label: string; days: number; fast:
   return { label: "Standard Delivery (7 days)", days: 7, fast: false };
 };
 
+const getPaymentMethodLabel = (order: any): string => {
+  const provider = String(order?.payment_provider ?? "").toLowerCase();
+  if (provider === "cod") return "Cash on Delivery";
+  if (provider === "razorpay") return "Online Payment";
+  if (provider) return provider.toUpperCase();
+  return order?.payment_status === "captured" ? "Online Payment" : "Pending";
+};
+
 export const OrdersPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -131,6 +139,7 @@ export const OrdersPage = () => {
   const [pickupAddressId, setPickupAddressId] = useState<string>("");
   const [confirmReturnRequest, setConfirmReturnRequest] = useState(false);
   const [showPickupAddressForm, setShowPickupAddressForm] = useState(false);
+  const [detailsOrderId, setDetailsOrderId] = useState<string | null>(null);
   const [pickupAddressForm, setPickupAddressForm] = useState({
     label: "Pickup",
     fullName: "",
@@ -483,6 +492,33 @@ export const OrdersPage = () => {
               </p>
             </div>
           </div>
+          <div className="mt-2 flex justify-end">
+            <Button
+              variant="ghost"
+              className={`rounded-full px-3 py-1.5 text-xs ${isRoyal ? "border border-gold-400/50 bg-gold-500/10 text-gold-700" : "border border-zinc-300 bg-zinc-100 text-zinc-700"}`}
+              onClick={() => setDetailsOrderId((current) => (current === order.id ? null : order.id))}
+            >
+              {detailsOrderId === order.id ? "Hide Details" : "View Details"}
+            </Button>
+          </div>
+          {detailsOrderId === order.id ? (
+            <div className={`mt-2 rounded-lg border p-3 text-xs ${isRoyal ? "border-gold-400/60 bg-[#fff8e3]" : "border-zinc-300 bg-zinc-50"}`}>
+              <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
+                <p className="text-zinc-700">
+                  Payment Method: <span className="font-semibold text-zinc-900">{getPaymentMethodLabel(order)}</span>
+                </p>
+                <p className="text-zinc-700">
+                  Payment Status: <span className="font-semibold text-zinc-900">{String(order.payment_status ?? "pending").toUpperCase()}</span>
+                </p>
+                <p className="text-zinc-700">
+                  Order Number: <span className="font-semibold text-zinc-900">#{order.order_number}</span>
+                </p>
+                <p className="text-zinc-700">
+                  Reference: <span className="font-semibold text-zinc-900">{order.payment_ref || "Not available"}</span>
+                </p>
+              </div>
+            </div>
+          ) : null}
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <p className="rounded-full border border-gold-400/40 bg-gold-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gold-200">
               {order.status === "cancelled" || order.status === "refunded" || order.status === "delivered"
