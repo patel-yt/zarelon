@@ -119,6 +119,23 @@ const getPaymentMethodLabel = (order: any): string => {
   return order?.payment_status === "captured" ? "Online Payment" : "Pending";
 };
 
+const formatCompactOrderDate = (value: string | null | undefined) => {
+  if (!value) return "Date unavailable";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
+  return date.toLocaleDateString(undefined, { month: "short", day: "2-digit", year: "numeric" });
+};
+
+const getOrderHeadline = (order: any) => {
+  const dateText = formatCompactOrderDate(order.updated_at ?? order.created_at);
+  if (order.status === "delivered") return `Delivered on ${dateText}`;
+  if (order.status === "cancelled") return `Cancelled on ${dateText}`;
+  if (order.status === "refunded") return `Refunded on ${dateText}`;
+  if (order.status === "shipped") return `Shipped on ${dateText}`;
+  if (order.status === "confirmed") return `Confirmed on ${dateText}`;
+  return `Placed on ${dateText}`;
+};
+
 export const OrdersPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -499,19 +516,26 @@ export const OrdersPage = () => {
             }`}
             onClick={() => setDetailsOrderId((current) => (current === order.id ? null : order.id))}
           >
-            <div>
-              <p className="text-sm font-semibold text-zinc-900">
-                {order.status === "cancelled" || order.status === "refunded" || order.status === "delivered"
-                  ? orderLabel[order.status] ?? order.status
-                  : order.shipments?.[0]
-                  ? trackingLabel[order.shipments[0].normalized_status] ?? order.shipments[0].normalized_status
-                  : orderLabel[order.status] ?? order.status}
-              </p>
-              <p className="text-xs text-zinc-600">
-                {order.order_items?.[0]?.title_snapshot ?? "Tap to view full order details"}
-              </p>
+            <div className="flex min-w-0 items-center gap-3">
+              {order.order_items?.[0]?.product?.image_url ? (
+                <img
+                  src={order.order_items[0].product.image_url}
+                  alt={order.order_items?.[0]?.title_snapshot ?? "Product"}
+                  className="h-14 w-14 rounded-md border border-zinc-300 object-cover"
+                />
+              ) : (
+                <div className="grid h-14 w-14 place-items-center rounded-md border border-zinc-300 bg-white text-[10px] uppercase text-zinc-500">
+                  Item
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-zinc-900">{getOrderHeadline(order)}</p>
+                <p className="truncate text-xs text-zinc-600">
+                  {order.order_items?.[0]?.title_snapshot ?? "Tap to view full order details"}
+                </p>
+              </div>
             </div>
-            <span className="text-lg text-zinc-700">{detailsOrderId === order.id ? "▾" : "▸"}</span>
+            <span className="pl-2 text-lg text-zinc-700">{detailsOrderId === order.id ? "▾" : "▸"}</span>
           </button>
           {detailsOrderId === order.id ? (
             <>
