@@ -431,11 +431,11 @@ export const OrdersPage = () => {
   if (!user) return <div>Please sign in to view orders.</div>;
 
   return (
-    <div className="space-y-5 rounded-2xl border border-white/40 bg-white p-4 text-white sm:p-6">
+    <div className="space-y-5 rounded-2xl border border-zinc-300/80 bg-white p-4 text-zinc-900 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-heading text-3xl text-gold-200 sm:text-4xl">Order History</h1>
-          <p className="mt-1 text-xs uppercase tracking-[0.16em] text-white/50">Live shipment + premium support timeline</p>
+          <h1 className="font-heading text-3xl text-zinc-900 sm:text-4xl">Order History</h1>
+          <p className="mt-1 text-xs uppercase tracking-[0.16em] text-zinc-600">Live shipment + premium support timeline</p>
         </div>
         <span className="rounded-full border border-gold-400/35 bg-gold-500/10 px-3 py-1 text-xs uppercase tracking-[0.15em] text-gold-200">
           {eliteQuery.data?.progress?.current_tier?.name ?? "Base"} Tier
