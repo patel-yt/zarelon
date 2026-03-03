@@ -32,6 +32,9 @@ type ShiprocketCreateOrderResponse = {
   courier_name?: string;
   channel_order_id?: string;
   message?: string;
+  status?: boolean | number | string;
+  data?: Record<string, unknown>;
+  errors?: unknown;
 };
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
@@ -55,6 +58,23 @@ const safeJson = async (response: Response): Promise<Record<string, unknown>> =>
   } catch {
     return {};
   }
+};
+
+const toCleanString = (value: unknown): string => {
+  if (typeof value === "number") return String(value);
+  if (typeof value !== "string") return "";
+  const text = value.trim();
+  if (!text) return "";
+  if (["null", "undefined", "na", "n/a"].includes(text.toLowerCase())) return "";
+  return text;
+};
+
+const pickString = (input: Record<string, unknown>, keys: string[]): string => {
+  for (const key of keys) {
+    const value = toCleanString(input[key]);
+    if (value) return value;
+  }
+  return "";
 };
 
 export const getShiprocketToken = async (): Promise<string | null> => {
@@ -242,13 +262,49 @@ export const createShiprocketForwardOrder = async (input: CreateShiprocketForwar
     throw new Error(reason);
   }
 
+  const root = json as unknown as Record<string, unknown>;
+  const nestedData =
+    root.data && typeof root.data === "object" && !Array.isArray(root.data) ? (root.data as Record<string, unknown>) : {};
+  const shiprocketOrderId = pickString(root, ["order_id", "channel_order_id"]) || pickString(nestedData, ["order_id", "channel_order_id"]);
+  const shipmentId = pickString(root, ["shipment_id"]) || pickString(nestedData, ["shipment_id"]);
+  const awbNumber = pickString(root, ["awb_code", "tracking_number"]) || pickString(nestedData, ["awb_code", "tracking_number"]);
+  const trackingNumber =
+    pickString(root, ["tracking_number", "awb_code"]) || pickString(nestedData, ["tracking_number", "awb_code"]);
+  const trackingUrl = pickString(root, ["tracking_url"]) || pickString(nestedData, ["tracking_url"]);
+  const carrierName = pickString(root, ["courier_name"]) || pickString(nestedData, ["courier_name"]) || "Shiprocket";
+
+  const accepted = root.status;
+  const isAccepted =
+    typeof accepted === "boolean"
+      ? accepted
+      : typeof accepted === "number"
+      ? accepted === 1
+      : typeof accepted === "string"
+      ? ["1", "true", "success", "ok"].includes(accepted.toLowerCase())
+      : true;
+
+  if (!isAccepted || (!shiprocketOrderId && !shipmentId && !awbNumber && !trackingNumber)) {
+    const errorBits: string[] = [];
+    const message = toCleanString(root.message);
+    if (message) errorBits.push(message);
+    if (root.errors !== undefined) {
+      try {
+        errorBits.push(`errors=${JSON.stringify(root.errors)}`);
+      } catch {
+        errorBits.push("errors=unserializable");
+      }
+    }
+    if (!errorBits.length) errorBits.push("Shiprocket create response missing order/shipment/tracking ids");
+    throw new Error(errorBits.join(" | "));
+  }
+
   return {
-    shiprocketOrderId: String(json.order_id ?? json.channel_order_id ?? ""),
-    shipmentId: String(json.shipment_id ?? ""),
-    awbNumber: String(json.awb_code ?? json.tracking_number ?? ""),
-    trackingNumber: String(json.tracking_number ?? json.awb_code ?? ""),
-    trackingUrl: String(json.tracking_url ?? ""),
-    carrierName: String(json.courier_name ?? "Shiprocket"),
+    shiprocketOrderId,
+    shipmentId,
+    awbNumber,
+    trackingNumber,
+    trackingUrl,
+    carrierName,
     raw: json,
   };
 };
