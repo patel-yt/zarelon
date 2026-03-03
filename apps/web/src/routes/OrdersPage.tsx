@@ -431,30 +431,36 @@ export const OrdersPage = () => {
   if (!user) return <div>Please sign in to view orders.</div>;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-heading text-3xl text-gold-200">Order History</h1>
+    <div className="space-y-5 rounded-2xl border border-gold-400/15 bg-[radial-gradient(circle_at_top_right,rgba(212,175,55,0.13),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0))] p-4 sm:p-6">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-heading text-3xl text-gold-200 sm:text-4xl">Order History</h1>
+          <p className="mt-1 text-xs uppercase tracking-[0.16em] text-white/50">Live shipment + premium support timeline</p>
+        </div>
         <span className="rounded-full border border-gold-400/35 bg-gold-500/10 px-3 py-1 text-xs uppercase tracking-[0.15em] text-gold-200">
           {eliteQuery.data?.progress?.current_tier?.name ?? "Base"} Tier
         </span>
       </div>
-      {cancelMessage ? <p className="text-xs text-emerald-300">{cancelMessage}</p> : null}
-      {cancelError ? <p className="text-xs text-rose-300">{cancelError}</p> : null}
-      {refundMessage ? <p className="text-xs text-emerald-300">{refundMessage}</p> : null}
-      {refundError ? <p className="text-xs text-rose-300">{refundError}</p> : null}
-      {returnMessage ? <p className="text-xs text-emerald-300">{returnMessage}</p> : null}
-      {returnError ? <p className="text-xs text-rose-300">{returnError}</p> : null}
+      {cancelMessage ? <p className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">{cancelMessage}</p> : null}
+      {cancelError ? <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">{cancelError}</p> : null}
+      {refundMessage ? <p className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">{refundMessage}</p> : null}
+      {refundError ? <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">{refundError}</p> : null}
+      {returnMessage ? <p className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">{returnMessage}</p> : null}
+      {returnError ? <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">{returnError}</p> : null}
       {(query.data ?? []).map((order) => (
-        <div key={order.id} className="glass rounded-xl bg-[#111111] p-4 text-white">
+        <div
+          key={order.id}
+          className="rounded-2xl border border-white/12 bg-[linear-gradient(160deg,rgba(26,26,26,0.98),rgba(10,10,10,0.98))] p-4 text-white shadow-[0_18px_50px_rgba(0,0,0,0.45)] backdrop-blur-sm sm:p-5"
+        >
           {(() => {
             const delivery = getDeliveryCommitment(order);
             return (
-              <div className="mb-2 flex justify-end">
+              <div className="mb-3 flex justify-end">
                 <p
-                  className={`rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.14em] ${
+                  className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${
                     delivery.fast
                       ? "border border-emerald-400/45 bg-emerald-500/15 text-emerald-200"
-                      : "border border-sky-400/45 bg-sky-500/15 text-sky-200"
+                      : "border border-cyan-400/45 bg-cyan-500/15 text-cyan-200"
                   }`}
                 >
                   {delivery.label}
@@ -462,19 +468,21 @@ export const OrdersPage = () => {
               </div>
             );
           })()}
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 pb-3">
             <div>
-              <p className="font-medium">#{order.order_number}</p>
-              <p className="text-xs text-white/60">{new Date(order.created_at).toLocaleString()}</p>
+              <p className="text-[11px] uppercase tracking-[0.15em] text-white/45">Order ID</p>
+              <p className="font-heading text-lg text-gold-100">#{order.order_number}</p>
+              <p className="mt-1 text-xs text-white/55">{new Date(order.created_at).toLocaleString()}</p>
             </div>
             <div className="ml-auto flex flex-wrap items-center justify-end gap-2 text-right">
-              <p className="min-w-[110px] text-right">
+              <p className="text-[11px] uppercase tracking-[0.15em] text-white/45">Order Value</p>
+              <p className="min-w-[130px] text-right font-heading text-xl text-white">
                 {currencyQuery.data ? formatCurrencyAmount(order.total_inr, currencyQuery.data) : formatINR(order.total_inr)}
               </p>
             </div>
           </div>
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-center">
-            <p className="rounded-full border border-gold-400/40 bg-gold-500/10 px-3 py-1 text-xs uppercase tracking-wider text-gold-200">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <p className="rounded-full border border-gold-400/40 bg-gold-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gold-200">
               {order.status === "cancelled" || order.status === "refunded" || order.status === "delivered"
                 ? orderLabel[order.status] ?? order.status
                 : order.shipments?.[0]
@@ -482,13 +490,17 @@ export const OrdersPage = () => {
                 : orderLabel[order.status] ?? order.status}
             </p>
             {order.refund_status && order.refund_status !== "none" && (
-              <p className="text-xs uppercase text-red-300">{refundLabel[order.refund_status] ?? order.refund_status}</p>
+              <p className="rounded-full border border-rose-400/30 bg-rose-500/10 px-3 py-1 text-[11px] uppercase text-rose-200">
+                {refundLabel[order.refund_status] ?? order.refund_status}
+              </p>
             )}
             {order.cancel_status && order.cancel_status !== "none" && (
-              <p className="text-xs uppercase text-rose-300">{cancelLabel[order.cancel_status] ?? order.cancel_status}</p>
+              <p className="rounded-full border border-rose-400/30 bg-rose-500/10 px-3 py-1 text-[11px] uppercase text-rose-200">
+                {cancelLabel[order.cancel_status] ?? order.cancel_status}
+              </p>
             )}
             {(order.return_requests ?? []).some((r: any) => activeReturnStatuses.includes(r.status)) ? (
-              <p className="text-xs uppercase text-amber-200">
+              <p className="rounded-full border border-amber-400/35 bg-amber-500/10 px-3 py-1 text-[11px] uppercase text-amber-200">
                 Return Request{" "}
                 {(order.return_requests ?? []).find((r: any) => activeReturnStatuses.includes(r.status))?.status}
               </p>
@@ -499,7 +511,7 @@ export const OrdersPage = () => {
               {(order.status === "pending" || order.status === "confirmed") && (
                 <Button
                   variant="ghost"
-                  className="px-3 py-1 text-xs text-rose-200"
+                  className="rounded-full border border-rose-400/35 bg-rose-500/10 px-4 py-1.5 text-xs text-rose-200"
                   onClick={async () => {
                     const reason = window.prompt("Reason for cancellation (optional):")?.trim() || undefined;
                     try {
@@ -521,7 +533,7 @@ export const OrdersPage = () => {
                 </Button>
               )}
               {order.status !== "pending" && order.status !== "confirmed" && (
-                <Button variant="ghost" className="px-3 py-1 text-xs text-white/55" disabled>
+                <Button variant="ghost" className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs text-white/55" disabled>
                   Cancel Unavailable (After Shipping)
                 </Button>
               )}
@@ -532,7 +544,7 @@ export const OrdersPage = () => {
               order.refund_status !== "refunded" ? (
                 <Button
                   variant="ghost"
-                  className="px-3 py-1 text-xs text-emerald-200"
+                  className="rounded-full border border-emerald-400/35 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-200"
                   disabled={refundRequestMutation.isPending || payoutQuery.isLoading}
                   onClick={() => requestRefundFlow(order)}
                 >
@@ -543,7 +555,7 @@ export const OrdersPage = () => {
           </div>
 
           {!!order.order_items?.length ? (
-            <div className="mt-3 rounded-lg border border-white/10 bg-black/15 p-3">
+            <div className="mt-3 rounded-xl border border-white/10 bg-black/25 p-3.5">
               <p className="mb-2 text-xs uppercase tracking-wider text-white/65">Ordered Items</p>
               <div className="space-y-2">
                 {order.order_items.map((item: any) => {
@@ -560,7 +572,7 @@ export const OrdersPage = () => {
                   const activeRequest = Boolean(item?.active_request) || activeReturnStatuses.includes(openRequest?.status);
                   const permanentLock = refundLocked && exchangeLocked && !refundOverride && !exchangeOverride;
                   return (
-                    <div key={item.id} className="rounded border border-white/10 bg-black/20 p-2">
+                    <div key={item.id} className="rounded-lg border border-white/10 bg-black/25 p-2.5">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <p className="text-sm text-white/90">
                           {item.title_snapshot} x {item.quantity}
@@ -814,19 +826,24 @@ export const OrdersPage = () => {
             const activeStep = timeline.indexOf(shipmentState as (typeof timeline)[number]);
             const clampedStep = activeStep < 0 ? 0 : activeStep;
             return (
-              <div className="mt-4 rounded-lg border border-white/10 bg-black/20 p-3 text-center">
+              <div className="mt-4 rounded-xl border border-white/10 bg-black/25 p-3 text-center">
                 <p className="mb-3 text-xs uppercase tracking-wider text-white/65">Order Progress</p>
                 <div className="mx-auto grid max-w-3xl gap-2 sm:grid-cols-5">
                   {timeline.map((step, index) => {
                     const done = index <= clampedStep;
                     return (
-                      <div key={step} className="flex items-center gap-2">
+                      <div key={step} className="rounded-md border border-white/10 bg-white/[0.03] px-2 py-1.5 text-left">
+                        <div className="mb-1 h-[2px] w-full rounded-full bg-white/10">
+                          <div className={`h-full rounded-full ${done ? "w-full bg-gold-300" : "w-0 bg-transparent"}`} />
+                        </div>
+                        <div className="flex items-center gap-2">
                         <div
                           className={`h-2.5 w-2.5 rounded-full ${
                             done ? "bg-gold-300 shadow-[0_0_10px_rgba(212,175,55,0.65)]" : "bg-white/25"
                           }`}
                         />
                         <p className={`text-xs ${done ? "text-gold-100" : "text-white/45"}`}>{trackingLabel[step]}</p>
+                        </div>
                       </div>
                     );
                   })}
@@ -836,13 +853,13 @@ export const OrdersPage = () => {
           })()}
 
           {order.shipments?.[0] ? (
-            <div className="mt-4 rounded-lg border border-white/10 bg-black/20 p-3">
+            <div className="mt-4 rounded-xl border border-white/10 bg-black/25 p-3">
               {(() => {
                 const latestEvent = getLatestShipmentEvent(order);
                 const currentCity = latestEvent?.location || "Location unavailable";
                 const eta = order.shipments[0].eta;
                 return (
-                  <div className="mb-3 grid gap-2 rounded-md border border-gold-500/20 bg-gold-500/5 p-3 text-xs sm:grid-cols-3">
+                  <div className="mb-3 grid gap-2 rounded-lg border border-gold-500/20 bg-gold-500/5 p-3 text-xs sm:grid-cols-3">
                     <p className="text-white/85">
                       Current Location: <span className="text-gold-100">{currentCity}</span>
                     </p>
@@ -863,7 +880,7 @@ export const OrdersPage = () => {
                   <p className="text-sm text-white/90">
                     Courier: <span className="text-gold-100">{order.shipments[0].carrier_name}</span>
                   </p>
-                  <p className="text-xs text-white/70">Tracking ID: {order.shipments[0].tracking_number}</p>
+                  <p className="text-xs text-white/70">Tracking ID: {order.shipments[0].tracking_number || "Pending assignment"}</p>
                 </div>
                 <p className="text-xs uppercase tracking-wider text-gold-300">
                   {trackingLabel[order.shipments[0].normalized_status] ?? order.shipments[0].normalized_status}
@@ -874,7 +891,7 @@ export const OrdersPage = () => {
                   href={order.shipments[0].tracking_url}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 inline-block text-xs text-gold-200 underline"
+                  className="mt-2 inline-block rounded-full border border-gold-400/35 bg-gold-500/10 px-3 py-1 text-xs text-gold-200"
                 >
                   Open courier tracking
                 </a>
