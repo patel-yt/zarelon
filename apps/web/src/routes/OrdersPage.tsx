@@ -447,28 +447,30 @@ export const OrdersPage = () => {
       {refundError ? <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">{refundError}</p> : null}
       {returnMessage ? <p className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">{returnMessage}</p> : null}
       {returnError ? <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">{returnError}</p> : null}
-      {(query.data ?? []).map((order) => (
+      {(query.data ?? []).map((order) => {
+        const delivery = getDeliveryCommitment(order);
+        const isRoyal = delivery.fast;
+        return (
         <div
           key={order.id}
-          className="rounded-2xl border border-zinc-300 bg-white p-4 text-zinc-900 shadow-[0_12px_24px_rgba(0,0,0,0.08)] sm:p-5"
+          className={`rounded-2xl border bg-white p-4 text-zinc-900 sm:p-5 ${
+            isRoyal
+              ? "border-gold-400/70 shadow-[0_16px_32px_rgba(212,175,55,0.22)]"
+              : "border-zinc-300 shadow-[0_12px_24px_rgba(0,0,0,0.08)]"
+          }`}
         >
-          {(() => {
-            const delivery = getDeliveryCommitment(order);
-            return (
-              <div className="mb-3 flex justify-end">
-                <p
-                  className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${
-                    delivery.fast
-                      ? "border border-emerald-400/45 bg-emerald-500/15 text-emerald-200"
-                      : "border border-cyan-400/45 bg-cyan-500/15 text-cyan-200"
-                  }`}
-                >
-                  {delivery.label}
-                </p>
-              </div>
-            );
-          })()}
-          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-zinc-200 pb-3">
+          <div className="mb-3 flex justify-end">
+            <p
+              className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${
+                delivery.fast
+                  ? "border border-emerald-400/45 bg-emerald-500/15 text-emerald-200"
+                  : "border border-cyan-400/45 bg-cyan-500/15 text-cyan-200"
+              }`}
+            >
+              {delivery.label}
+            </p>
+          </div>
+          <div className={`flex flex-wrap items-start justify-between gap-3 border-b pb-3 ${isRoyal ? "border-gold-300/40" : "border-zinc-200"}`}>
             <div>
               <p className="text-[11px] uppercase tracking-[0.15em] text-zinc-500">Order ID</p>
               <p className="font-heading text-lg text-gold-100">#{order.order_number}</p>
@@ -533,7 +535,7 @@ export const OrdersPage = () => {
                 </Button>
               )}
               {order.status !== "pending" && order.status !== "confirmed" && (
-                <Button variant="ghost" className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs text-white/55" disabled>
+                <Button variant="ghost" className="rounded-full border border-zinc-300 bg-zinc-100 px-4 py-1.5 text-xs text-zinc-600" disabled>
                   Cancel Unavailable (After Shipping)
                 </Button>
               )}
@@ -555,8 +557,8 @@ export const OrdersPage = () => {
           </div>
 
           {!!order.order_items?.length ? (
-            <div className="mt-3 rounded-xl border border-white/10 bg-black/25 p-3.5">
-              <p className="mb-2 text-xs uppercase tracking-wider text-white/65">Ordered Items</p>
+            <div className={`mt-3 rounded-xl border p-3.5 ${isRoyal ? "border-gold-400/50 bg-[#14130f] text-white shadow-[inset_0_0_0_1px_rgba(212,175,55,0.16)]" : "border-zinc-200 bg-zinc-50"}`}>
+              <p className={`mb-2 text-xs uppercase tracking-wider ${isRoyal ? "text-white/65" : "text-zinc-500"}`}>Ordered Items</p>
               <div className="space-y-2">
                 {order.order_items.map((item: any) => {
                   const daysLeft = daysLeftForItem(order, item);
@@ -572,16 +574,16 @@ export const OrdersPage = () => {
                   const activeRequest = Boolean(item?.active_request) || activeReturnStatuses.includes(openRequest?.status);
                   const permanentLock = refundLocked && exchangeLocked && !refundOverride && !exchangeOverride;
                   return (
-                    <div key={item.id} className="rounded-lg border border-white/10 bg-black/25 p-2.5">
+                    <div key={item.id} className={`rounded-lg border p-2.5 ${isRoyal ? "border-gold-400/45 bg-black/35 text-white" : "border-zinc-200 bg-white"}`}>
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-sm text-white/90">
+                        <p className={`text-sm ${isRoyal ? "text-white/90" : "text-zinc-800"}`}>
                           {item.title_snapshot} x {item.quantity}
                           {item.variant?.color || item.variant?.size
                             ? ` (${item.variant?.color ?? "N/A"} / ${item.variant?.size ?? "N/A"})`
                             : ""}
                         </p>
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-xs text-white/60">Window: {daysLeft >= 0 ? `${daysLeft} day(s) left` : "Closed"}</p>
+                          <p className={`text-xs ${isRoyal ? "text-white/60" : "text-zinc-600"}`}>Window: {daysLeft >= 0 ? `${daysLeft} day(s) left` : "Closed"}</p>
                           {openRequest ? (
                             <span className="rounded-full border border-amber-400/35 bg-amber-500/10 px-2 py-0.5 text-[11px] text-amber-200">
                           {openRequest.type} {openRequest.status}
@@ -616,7 +618,7 @@ export const OrdersPage = () => {
                           </span>
                         ) : null}
                         {!permanentLock ? (
-                          <span className="rounded-full border border-white/20 bg-black/30 px-2 py-0.5 text-[11px] text-white/75">
+                          <span className={`rounded-full px-2 py-0.5 text-[11px] ${isRoyal ? "border border-white/20 bg-black/30 text-white/75" : "border border-zinc-300 bg-zinc-100 text-zinc-700"}`}>
                             Attempts: Refund {item?.refund_attempts ?? 0} | Exchange {item?.exchange_attempts ?? 0}
                           </span>
                         ) : null}
@@ -665,17 +667,17 @@ export const OrdersPage = () => {
                         ) : null}
                       </div>
                       {openRequest ? (
-                        <div className="mt-2 rounded border border-white/10 bg-black/25 p-2">
-                          <p className="text-[11px] uppercase text-white/60">Return Timeline</p>
-                          <p className="text-xs text-white/80">{returnStatusLabel[openRequest.status] ?? openRequest.status}</p>
+                        <div className={`mt-2 rounded border p-2 ${isRoyal ? "border-white/10 bg-black/25" : "border-zinc-200 bg-zinc-50"}`}>
+                          <p className={`text-[11px] uppercase ${isRoyal ? "text-white/60" : "text-zinc-500"}`}>Return Timeline</p>
+                          <p className={`text-xs ${isRoyal ? "text-white/80" : "text-zinc-700"}`}>{returnStatusLabel[openRequest.status] ?? openRequest.status}</p>
                           {openRequest.pickup_status && openRequest.pickup_status !== "none" ? (
-                            <p className="text-xs text-white/70">Pickup: {openRequest.pickup_status}</p>
+                            <p className={`text-xs ${isRoyal ? "text-white/70" : "text-zinc-600"}`}>Pickup: {openRequest.pickup_status}</p>
                           ) : null}
                           {openRequest.pickup_tracking_number ? (
-                            <p className="text-xs text-white/70">Pickup Tracking: {openRequest.pickup_tracking_number}</p>
+                            <p className={`text-xs ${isRoyal ? "text-white/70" : "text-zinc-600"}`}>Pickup Tracking: {openRequest.pickup_tracking_number}</p>
                           ) : null}
                           {openRequest.refund_status && openRequest.refund_status !== "none" ? (
-                            <p className="text-xs text-white/70">Refund: {openRequest.refund_status}</p>
+                            <p className={`text-xs ${isRoyal ? "text-white/70" : "text-zinc-600"}`}>Refund: {openRequest.refund_status}</p>
                           ) : null}
                           {openRequest.refunded_at ? (
                             <p className="text-xs text-emerald-200">
@@ -698,7 +700,7 @@ export const OrdersPage = () => {
                                 .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                                 .slice(0, 5)
                                 .map((event: any) => (
-                                  <p key={event.id} className="text-[11px] text-white/65">
+                                  <p key={event.id} className={`text-[11px] ${isRoyal ? "text-white/65" : "text-zinc-600"}`}>
                                     {new Date(event.created_at).toLocaleString()} | {event.message}
                                   </p>
                                 ))}
@@ -826,14 +828,14 @@ export const OrdersPage = () => {
             const activeStep = timeline.indexOf(shipmentState as (typeof timeline)[number]);
             const clampedStep = activeStep < 0 ? 0 : activeStep;
             return (
-              <div className="mt-4 rounded-xl border border-white/10 bg-black/25 p-3 text-center">
-                <p className="mb-3 text-xs uppercase tracking-wider text-white/65">Order Progress</p>
+              <div className={`mt-4 rounded-xl border p-3 text-center ${isRoyal ? "border-gold-400/45 bg-[#17150f]" : "border-zinc-200 bg-white"}`}>
+                <p className={`mb-3 text-xs uppercase tracking-wider ${isRoyal ? "text-white/65" : "text-zinc-600"}`}>Order Progress</p>
                 <div className="mx-auto grid max-w-3xl gap-2 sm:grid-cols-5">
                   {timeline.map((step, index) => {
                     const done = index <= clampedStep;
                     return (
-                      <div key={step} className="rounded-md border border-white/10 bg-white/[0.03] px-2 py-1.5 text-left">
-                        <div className="mb-1 h-[2px] w-full rounded-full bg-white/10">
+                      <div key={step} className={`rounded-md border px-2 py-1.5 text-left ${isRoyal ? "border-gold-400/30 bg-white/[0.03]" : "border-zinc-200 bg-zinc-50"}`}>
+                        <div className={`mb-1 h-[2px] w-full rounded-full ${isRoyal ? "bg-white/10" : "bg-zinc-200"}`}>
                           <div className={`h-full rounded-full ${done ? "w-full bg-gold-300" : "w-0 bg-transparent"}`} />
                         </div>
                         <div className="flex items-center gap-2">
@@ -842,7 +844,7 @@ export const OrdersPage = () => {
                             done ? "bg-gold-300 shadow-[0_0_10px_rgba(212,175,55,0.65)]" : "bg-white/25"
                           }`}
                         />
-                        <p className={`text-xs ${done ? "text-gold-100" : "text-white/45"}`}>{trackingLabel[step]}</p>
+                        <p className={`text-xs ${done ? (isRoyal ? "text-gold-100" : "text-zinc-800") : (isRoyal ? "text-white/45" : "text-zinc-500")}`}>{trackingLabel[step]}</p>
                         </div>
                       </div>
                     );
@@ -853,20 +855,20 @@ export const OrdersPage = () => {
           })()}
 
           {order.shipments?.[0] ? (
-            <div className="mt-4 rounded-xl border border-white/10 bg-black/25 p-3">
+            <div className={`mt-4 rounded-xl border p-3 ${isRoyal ? "border-gold-400/45 bg-[#17150f]" : "border-zinc-200 bg-zinc-50"}`}>
               {(() => {
                 const latestEvent = getLatestShipmentEvent(order);
                 const currentCity = latestEvent?.location || "Location unavailable";
                 const eta = order.shipments[0].eta;
                 return (
-                  <div className="mb-3 grid gap-2 rounded-lg border border-gold-500/20 bg-gold-500/5 p-3 text-xs sm:grid-cols-3">
-                    <p className="text-white/85">
+                  <div className={`mb-3 grid gap-2 rounded-lg border p-3 text-xs sm:grid-cols-3 ${isRoyal ? "border-gold-500/30 bg-gold-500/5" : "border-zinc-200 bg-white"}`}>
+                    <p className={isRoyal ? "text-white/85" : "text-zinc-700"}>
                       Current Location: <span className="text-gold-100">{currentCity}</span>
                     </p>
-                    <p className="text-white/85">
+                    <p className={isRoyal ? "text-white/85" : "text-zinc-700"}>
                       Expected Delivery: <span className="text-gold-100">{formatDateOnly(eta)}</span>
                     </p>
-                    <p className="text-white/85">
+                    <p className={isRoyal ? "text-white/85" : "text-zinc-700"}>
                       Last Update:{" "}
                       <span className="text-gold-100">
                         {formatDateTime(latestEvent?.event_time ?? order.shipments[0].last_event_at)}
@@ -877,10 +879,10 @@ export const OrdersPage = () => {
               })()}
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="text-sm text-white/90">
+                  <p className={`text-sm ${isRoyal ? "text-white/90" : "text-zinc-800"}`}>
                     Courier: <span className="text-gold-100">{order.shipments[0].carrier_name}</span>
                   </p>
-                  <p className="text-xs text-white/70">Tracking ID: {order.shipments[0].tracking_number || "Pending assignment"}</p>
+                  <p className={`text-xs ${isRoyal ? "text-white/70" : "text-zinc-600"}`}>Tracking ID: {order.shipments[0].tracking_number || "Pending assignment"}</p>
                 </div>
                 <p className="text-xs uppercase tracking-wider text-gold-300">
                   {trackingLabel[order.shipments[0].normalized_status] ?? order.shipments[0].normalized_status}
@@ -898,13 +900,13 @@ export const OrdersPage = () => {
               )}
               {!!order.shipments[0].shipment_events?.length && (
                 <div className="mt-3 space-y-2">
-                  <p className="text-xs uppercase tracking-wider text-white/65">Courier Updates</p>
+                  <p className={`text-xs uppercase tracking-wider ${isRoyal ? "text-white/65" : "text-zinc-500"}`}>Courier Updates</p>
                   {order.shipments[0].shipment_events
                     ?.slice()
                     .sort((a, b) => new Date(b.event_time).getTime() - new Date(a.event_time).getTime())
                     .slice(0, 5)
                     .map((event) => (
-                      <div key={event.id} className="text-xs text-white/70">
+                      <div key={event.id} className={`text-xs ${isRoyal ? "text-white/70" : "text-zinc-600"}`}>
                         {new Date(event.event_time).toLocaleString()} |{" "}
                         {trackingLabel[event.normalized_status] ?? event.normalized_status}
                         {event.location ? ` | ${event.location}` : ""}
@@ -914,12 +916,13 @@ export const OrdersPage = () => {
               )}
             </div>
           ) : (
-            <p className="mt-3 text-xs text-white/60">
+            <p className={`mt-3 text-xs ${isRoyal ? "text-white/60" : "text-zinc-600"}`}>
               Courier not assigned yet. Status will update automatically after dispatch.
             </p>
           )}
         </div>
-      ))}
+      );
+      })}
       {!query.data?.length && <p className="text-sm text-[#555555]">No orders yet.</p>}
 
       {returnModalOrderId && selectedReturnItem ? (
