@@ -132,7 +132,17 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return sendError(res, 400, shipmentSyncError.message || "Order updated but shipment status sync failed");
   }
 
-  if ((parsed.data.status === "confirmed" || parsed.data.status === "shipped") && order.status !== parsed.data.status) {
+  const existingShipmentForSync = await adminClient
+    .from("shipments")
+    .select("id,tracking_number")
+    .eq("order_id", orderId)
+    .maybeSingle();
+  const existingTrackingNumber = String(existingShipmentForSync.data?.tracking_number ?? "").trim();
+  const shouldAttemptShiprocketSync =
+    (parsed.data.status === "confirmed" || parsed.data.status === "shipped") &&
+    (order.status !== parsed.data.status || !existingTrackingNumber);
+
+  if (shouldAttemptShiprocketSync) {
     const shippingAddress = ((order as any).shipping_address ?? {}) as Record<string, unknown>;
     const deliveryLane = String(shippingAddress.deliveryLane ?? "").toLowerCase();
     const royalPriorityDelivery =
@@ -149,12 +159,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       | "refunded";
     const rollbackTrackingStatus = toTrackingStatus(rollbackOrderStatus);
     try {
-      const existingShipment = await adminClient
-        .from("shipments")
-        .select("id,tracking_number")
-        .eq("order_id", orderId)
-        .maybeSingle();
-      if (!existingShipment.error && existingShipment.data?.tracking_number) {
+      if (existingTrackingNumber) {
         shiprocketSync = { attempted: true, success: true };
       } else {
       const itemsRes = await adminClient
