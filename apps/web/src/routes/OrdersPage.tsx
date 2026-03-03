@@ -103,6 +103,14 @@ const getLatestShipmentEvent = (order: any) =>
     ?.slice()
     .sort((a: any, b: any) => new Date(b.event_time).getTime() - new Date(a.event_time).getTime())[0] ?? null;
 
+const getDeliveryCommitment = (order: any): { label: string; days: number; fast: boolean } => {
+  const address = (order?.shipping_address ?? {}) as Record<string, unknown>;
+  const lane = String(address.deliveryLane ?? "").toLowerCase();
+  const royalFast = address.royalPriorityDelivery === true || String(address.royalPriorityDelivery) === "true";
+  if (lane === "priority" || royalFast) return { label: "Fast Delivery (3 days)", days: 3, fast: true };
+  return { label: "Standard Delivery (7 days)", days: 7, fast: false };
+};
+
 export const OrdersPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -438,6 +446,22 @@ export const OrdersPage = () => {
       {returnError ? <p className="text-xs text-rose-300">{returnError}</p> : null}
       {(query.data ?? []).map((order) => (
         <div key={order.id} className="glass rounded-xl bg-[#111111] p-4 text-white">
+          {(() => {
+            const delivery = getDeliveryCommitment(order);
+            return (
+              <div className="mb-2 flex justify-end">
+                <p
+                  className={`rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.14em] ${
+                    delivery.fast
+                      ? "border border-emerald-400/45 bg-emerald-500/15 text-emerald-200"
+                      : "border border-sky-400/45 bg-sky-500/15 text-sky-200"
+                  }`}
+                >
+                  {delivery.label}
+                </p>
+              </div>
+            );
+          })()}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="font-medium">#{order.order_number}</p>
