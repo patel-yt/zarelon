@@ -17,7 +17,7 @@ const titleCase = (value: string) =>
     .join(" ");
 
 const profileGlassyButtonClass =
-  "border border-black/15 bg-white/70 text-[#111111] backdrop-blur-md hover:border-black/25 hover:bg-white";
+  "rounded-xl border border-[#d7c18a]/60 bg-gradient-to-br from-[#fff9ec] to-[#f4ead0] text-[#2a2110] shadow-[0_10px_24px_-16px_rgba(0,0,0,0.45)] backdrop-blur-md hover:border-[#c6a24b] hover:from-[#fff6e2] hover:to-[#f0e2bf]";
 
 export const ProfilePage = () => {
   const { user, profile, refreshProfile } = useAuth();
@@ -97,28 +97,28 @@ export const ProfilePage = () => {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="premium-luxe-card rounded-2xl border border-black/10 bg-white p-6 text-[#111111] shadow-[0_12px_28px_-20px_rgba(0,0,0,0.35)]">
+      <div className="premium-luxe-card rounded-3xl border border-[#d6bf89]/55 bg-[linear-gradient(145deg,#fffdf7,#f6ecd3)] p-6 text-[#111111] shadow-[0_22px_50px_-28px_rgba(0,0,0,0.45)]">
         <h2 className="font-heading text-2xl text-[#111111]">Quick Access</h2>
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <Link to="/orders" className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]">
+          <Link to="/orders" className="rounded-2xl border border-[#d6bf89]/55 bg-white/85 p-4 text-sm font-semibold text-[#1f1a12] shadow-[0_10px_24px_-18px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-0.5 hover:border-[#c6a24b] hover:bg-[#fff8e8]">
             Orders
           </Link>
-          <Link to="/wishlist" className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]">
+          <Link to="/wishlist" className="rounded-2xl border border-[#d6bf89]/55 bg-white/85 p-4 text-sm font-semibold text-[#1f1a12] shadow-[0_10px_24px_-18px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-0.5 hover:border-[#c6a24b] hover:bg-[#fff8e8]">
             Wishlist
           </Link>
-          <Link to="/earn-500-off" className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]">
+          <Link to="/earn-500-off" className="rounded-2xl border border-[#d6bf89]/55 bg-white/85 p-4 text-sm font-semibold text-[#1f1a12] shadow-[0_10px_24px_-18px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-0.5 hover:border-[#c6a24b] hover:bg-[#fff8e8]">
             Coupons
           </Link>
           <a
             href="mailto:support@zarelon.com?subject=ZARELON%20Support%20Request"
-            className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]"
+            className="rounded-2xl border border-[#d6bf89]/55 bg-white/85 p-4 text-sm font-semibold text-[#1f1a12] shadow-[0_10px_24px_-18px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-0.5 hover:border-[#c6a24b] hover:bg-[#fff8e8]"
           >
             Customer Support
           </a>
         </div>
       </div>
 
-      <div className="premium-luxe-card rounded-2xl border border-black/10 bg-white p-6 text-[#111111] shadow-[0_12px_28px_-20px_rgba(0,0,0,0.35)]">
+      <div className="premium-luxe-card rounded-3xl border border-[#d6bf89]/55 bg-[linear-gradient(145deg,#fffefb,#f6edd8)] p-6 text-[#111111] shadow-[0_22px_50px_-28px_rgba(0,0,0,0.45)]">
       <h1 className="mb-5 font-heading text-3xl text-[#111111]">Profile</h1>
       <div className="space-y-2 text-sm text-[#333333]">
         <p>Email: {profile?.email ?? user.email}</p>
@@ -165,7 +165,7 @@ export const ProfilePage = () => {
         Refresh Profile Sync
       </Button>
       </div>
-      <div className="premium-luxe-card rounded-2xl border border-black/10 bg-white p-6 text-[#111111] shadow-[0_12px_28px_-20px_rgba(0,0,0,0.35)]">
+      <div className="premium-luxe-card rounded-3xl border border-[#d6bf89]/55 bg-[linear-gradient(145deg,#fffefb,#f6edd8)] p-6 text-[#111111] shadow-[0_22px_50px_-28px_rgba(0,0,0,0.45)]">
         <h2 className="font-heading text-2xl text-[#111111]">Refund Payout Details</h2>
         <p className="mt-1 text-xs text-[#666666]">
           Add bank account and one UPI. Refund requests will include these details for faster processing.
@@ -178,32 +178,32 @@ export const ProfilePage = () => {
             value={accountHolderName}
             onChange={(event) => setAccountHolderName(event.target.value)}
             placeholder="Account holder name"
-            className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm text-[#111111] outline-none placeholder:text-[#999999]"
+            className="rounded-xl border border-[#d7c18a]/55 bg-white px-3 py-2 text-sm text-[#111111] outline-none placeholder:text-[#999999] focus:border-[#c6a24b]"
           />
           <input
             value={bankName}
             onChange={(event) => setBankName(event.target.value)}
             placeholder="Bank name"
-            className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm text-[#111111] outline-none placeholder:text-[#999999]"
+            className="rounded-xl border border-[#d7c18a]/55 bg-white px-3 py-2 text-sm text-[#111111] outline-none placeholder:text-[#999999] focus:border-[#c6a24b]"
           />
           <input
             value={bankAccountNumber}
             onChange={(event) => setBankAccountNumber(event.target.value)}
             placeholder="Bank account number"
-            className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm text-[#111111] outline-none placeholder:text-[#999999]"
+            className="rounded-xl border border-[#d7c18a]/55 bg-white px-3 py-2 text-sm text-[#111111] outline-none placeholder:text-[#999999] focus:border-[#c6a24b]"
           />
           <input
             value={bankIfsc}
             onChange={(event) => setBankIfsc(event.target.value)}
             placeholder="IFSC code"
-            className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm text-[#111111] outline-none placeholder:text-[#999999]"
+            className="rounded-xl border border-[#d7c18a]/55 bg-white px-3 py-2 text-sm text-[#111111] outline-none placeholder:text-[#999999] focus:border-[#c6a24b]"
           />
           <div className="md:col-span-2">
             <input
               value={upiId}
               onChange={(event) => setUpiId(event.target.value)}
               placeholder="UPI ID (example@bank)"
-              className="w-full rounded-xl border border-black/15 bg-white px-3 py-2 text-sm text-[#111111] outline-none placeholder:text-[#999999]"
+              className="w-full rounded-xl border border-[#d7c18a]/55 bg-white px-3 py-2 text-sm text-[#111111] outline-none placeholder:text-[#999999] focus:border-[#c6a24b]"
             />
             {(upiId.trim() || accountHolderName.trim()) && (
               <div className="mt-2 rounded-lg border border-[#d4af37]/25 bg-[#fff8e8] p-3 text-xs text-[#555555]">
