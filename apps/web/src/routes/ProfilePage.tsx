@@ -3,8 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/Button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/features/auth/AuthContext";
-import { creatorApi, eliteApi } from "@/lib/apiClient";
-import { appEnv } from "@/lib/env";
+import { eliteApi } from "@/lib/apiClient";
 import { supabase } from "@/lib/supabase";
 import type { RefundPayoutAccount } from "@/types/domain";
 
@@ -32,7 +31,6 @@ export const ProfilePage = () => {
   const [upiId, setUpiId] = useState("");
   const [saveMessage, setSaveMessage] = useState("");
   const [saveError, setSaveError] = useState("");
-  const [referralMessage, setReferralMessage] = useState("");
 
   if (!user) return <div>Please sign in.</div>;
 
@@ -54,76 +52,6 @@ export const ProfilePage = () => {
     queryFn: eliteApi.getMyStatus,
     staleTime: 30_000,
   });
-  const creatorQuery = useQuery({
-    queryKey: ["creator-dashboard", user.id],
-    queryFn: creatorApi.getDashboard,
-    staleTime: 30_000,
-  });
-  const referralCodeQuery = useQuery({
-    queryKey: ["referral-code-fallback", user.id],
-    queryFn: async () => {
-      const { data } = await supabase.from("users").select("referral_code").eq("id", user.id).maybeSingle();
-      if (data?.referral_code) return data.referral_code as string;
-
-      const gen = await supabase.rpc("generate_referral_code");
-      if (gen.error || typeof gen.data !== "string") return null;
-
-      await supabase.from("users").update({ referral_code: gen.data }).eq("id", user.id).is("referral_code", null);
-      const latest = await supabase.from("users").select("referral_code").eq("id", user.id).maybeSingle();
-      return (latest.data?.referral_code as string | null) ?? null;
-    },
-    staleTime: 60_000,
-  });
-  const referralCode = creatorQuery.data?.creator?.referral_code ?? profile?.referral_code ?? referralCodeQuery.data ?? "";
-  const shareBaseUrl = useMemo(() => {
-    const envUrl = appEnv.publicSiteUrl.trim().replace(/\/+$/, "");
-    if (envUrl) return envUrl;
-    if (typeof window === "undefined") return "";
-    const runtimeOrigin = window.location.origin.trim().replace(/\/+$/, "");
-    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(runtimeOrigin)) return "";
-    return runtimeOrigin;
-  }, []);
-  const referralLink = useMemo(() => {
-    if (!referralCode || !shareBaseUrl) return "";
-    return `${shareBaseUrl}/?ref=${referralCode}`;
-  }, [referralCode, shareBaseUrl]);
-
-  const handleCopyReferralCode = async () => {
-    if (!referralCode) {
-      setReferralMessage("Referral code unavailable.");
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(referralCode);
-      setReferralMessage("Referral code copied.");
-    } catch {
-      setReferralMessage("Could not copy code.");
-    }
-  };
-
-  const handleCopyReferralLink = async () => {
-    if (!referralLink) {
-      setReferralMessage("Referral link unavailable.");
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(referralLink);
-      setReferralMessage("Referral link copied.");
-    } catch {
-      setReferralMessage("Could not copy link.");
-    }
-  };
-
-  const handleShareOnWhatsApp = () => {
-    if (!referralLink) {
-      setReferralMessage("Referral link unavailable.");
-      return;
-    }
-    const shareText = "Join using my referral link and unlock rewards.";
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText} ${referralLink}`)}`;
-    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-    setReferralMessage("WhatsApp share opened.");
-  };
 
   useEffect(() => {
     const payout = payoutQuery.data;
@@ -216,22 +144,25 @@ export const ProfilePage = () => {
         Refresh Profile Sync
       </Button>
       </div>
-
       <div className="premium-luxe-card rounded-2xl border border-black/10 bg-white p-6 text-[#111111] shadow-[0_12px_28px_-20px_rgba(0,0,0,0.35)]">
-      <h2 className="font-heading text-2xl text-[#111111]">Referral</h2>
-      <p className="mt-2 break-all text-sm text-[#444444]">{referralLink || "Referral code unavailable"}</p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <Button type="button" variant="ghost" className={profileGlassyButtonClass} onClick={handleCopyReferralCode}>
-          Copy Code
-        </Button>
-        <Button type="button" variant="ghost" className={profileGlassyButtonClass} onClick={handleCopyReferralLink}>
-          Copy Referral Link
-        </Button>
-        <Button type="button" variant="ghost" className={profileGlassyButtonClass} onClick={handleShareOnWhatsApp}>
-          Share on WhatsApp
-        </Button>
-      </div>
-      {referralMessage ? <p className="mt-2 text-xs text-[#666666]">{referralMessage}</p> : null}
+        <h2 className="font-heading text-2xl text-[#111111]">Quick Access</h2>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <Link to="/orders" className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]">
+            Orders
+          </Link>
+          <Link to="/wishlist" className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]">
+            Wishlist
+          </Link>
+          <Link to="/earn-500-off" className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]">
+            Coupons
+          </Link>
+          <a
+            href="mailto:support@zarelon.com?subject=ZARELON%20Support%20Request"
+            className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]"
+          >
+            Customer Support
+          </a>
+        </div>
       </div>
 
       <div className="premium-luxe-card rounded-2xl border border-black/10 bg-white p-6 text-[#111111] shadow-[0_12px_28px_-20px_rgba(0,0,0,0.35)]">
