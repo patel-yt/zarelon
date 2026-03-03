@@ -557,8 +557,8 @@ export const OrdersPage = () => {
           </div>
 
           {!!order.order_items?.length ? (
-            <div className={`mt-3 rounded-xl border p-3.5 ${isRoyal ? "border-gold-400/50 bg-[#14130f] text-white shadow-[inset_0_0_0_1px_rgba(212,175,55,0.16)]" : "border-zinc-200 bg-zinc-50"}`}>
-              <p className={`mb-2 text-xs uppercase tracking-wider ${isRoyal ? "text-white/65" : "text-zinc-500"}`}>Ordered Items</p>
+            <div className={`mt-3 rounded-xl border p-3.5 ${isRoyal ? "border-gold-400/70 bg-[#fffaf0] text-zinc-900 shadow-[inset_0_0_0_1px_rgba(212,175,55,0.18)]" : "border-zinc-200 bg-zinc-50"}`}>
+              <p className={`mb-2 text-xs uppercase tracking-wider ${isRoyal ? "text-zinc-700" : "text-zinc-500"}`}>Ordered Items</p>
               <div className="space-y-2">
                 {order.order_items.map((item: any) => {
                   const daysLeft = daysLeftForItem(order, item);
@@ -574,16 +574,16 @@ export const OrdersPage = () => {
                   const activeRequest = Boolean(item?.active_request) || activeReturnStatuses.includes(openRequest?.status);
                   const permanentLock = refundLocked && exchangeLocked && !refundOverride && !exchangeOverride;
                   return (
-                    <div key={item.id} className={`rounded-lg border p-2.5 ${isRoyal ? "border-gold-400/45 bg-black/35 text-white" : "border-zinc-200 bg-white"}`}>
+                    <div key={item.id} className={`rounded-lg border p-2.5 ${isRoyal ? "border-gold-300 bg-white text-zinc-900" : "border-zinc-200 bg-white"}`}>
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className={`text-sm ${isRoyal ? "text-white/90" : "text-zinc-800"}`}>
+                        <p className={`text-sm ${isRoyal ? "text-zinc-900" : "text-zinc-800"}`}>
                           {item.title_snapshot} x {item.quantity}
                           {item.variant?.color || item.variant?.size
                             ? ` (${item.variant?.color ?? "N/A"} / ${item.variant?.size ?? "N/A"})`
                             : ""}
                         </p>
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className={`text-xs ${isRoyal ? "text-white/60" : "text-zinc-600"}`}>Window: {daysLeft >= 0 ? `${daysLeft} day(s) left` : "Closed"}</p>
+                          <p className={`text-xs ${isRoyal ? "text-zinc-700" : "text-zinc-600"}`}>Window: {daysLeft >= 0 ? `${daysLeft} day(s) left` : "Closed"}</p>
                           {openRequest ? (
                             <span className="rounded-full border border-amber-400/35 bg-amber-500/10 px-2 py-0.5 text-[11px] text-amber-200">
                           {openRequest.type} {openRequest.status}
@@ -618,7 +618,7 @@ export const OrdersPage = () => {
                           </span>
                         ) : null}
                         {!permanentLock ? (
-                          <span className={`rounded-full px-2 py-0.5 text-[11px] ${isRoyal ? "border border-white/20 bg-black/30 text-white/75" : "border border-zinc-300 bg-zinc-100 text-zinc-700"}`}>
+                          <span className={`rounded-full px-2 py-0.5 text-[11px] ${isRoyal ? "border border-gold-300 bg-[#fff6dd] text-zinc-700" : "border border-zinc-300 bg-zinc-100 text-zinc-700"}`}>
                             Attempts: Refund {item?.refund_attempts ?? 0} | Exchange {item?.exchange_attempts ?? 0}
                           </span>
                         ) : null}
@@ -667,17 +667,17 @@ export const OrdersPage = () => {
                         ) : null}
                       </div>
                       {openRequest ? (
-                        <div className={`mt-2 rounded border p-2 ${isRoyal ? "border-white/10 bg-black/25" : "border-zinc-200 bg-zinc-50"}`}>
-                          <p className={`text-[11px] uppercase ${isRoyal ? "text-white/60" : "text-zinc-500"}`}>Return Timeline</p>
-                          <p className={`text-xs ${isRoyal ? "text-white/80" : "text-zinc-700"}`}>{returnStatusLabel[openRequest.status] ?? openRequest.status}</p>
+                        <div className={`mt-2 rounded border p-2 ${isRoyal ? "border-gold-300 bg-[#fff7e8]" : "border-zinc-200 bg-zinc-50"}`}>
+                          <p className={`text-[11px] uppercase ${isRoyal ? "text-zinc-600" : "text-zinc-500"}`}>Return Timeline</p>
+                          <p className={`text-xs ${isRoyal ? "text-zinc-800" : "text-zinc-700"}`}>{returnStatusLabel[openRequest.status] ?? openRequest.status}</p>
                           {openRequest.pickup_status && openRequest.pickup_status !== "none" ? (
-                            <p className={`text-xs ${isRoyal ? "text-white/70" : "text-zinc-600"}`}>Pickup: {openRequest.pickup_status}</p>
+                            <p className={`text-xs ${isRoyal ? "text-zinc-700" : "text-zinc-600"}`}>Pickup: {openRequest.pickup_status}</p>
                           ) : null}
                           {openRequest.pickup_tracking_number ? (
-                            <p className={`text-xs ${isRoyal ? "text-white/70" : "text-zinc-600"}`}>Pickup Tracking: {openRequest.pickup_tracking_number}</p>
+                            <p className={`text-xs ${isRoyal ? "text-zinc-700" : "text-zinc-600"}`}>Pickup Tracking: {openRequest.pickup_tracking_number}</p>
                           ) : null}
                           {openRequest.refund_status && openRequest.refund_status !== "none" ? (
-                            <p className={`text-xs ${isRoyal ? "text-white/70" : "text-zinc-600"}`}>Refund: {openRequest.refund_status}</p>
+                            <p className={`text-xs ${isRoyal ? "text-zinc-700" : "text-zinc-600"}`}>Refund: {openRequest.refund_status}</p>
                           ) : null}
                           {openRequest.refunded_at ? (
                             <p className="text-xs text-emerald-200">
@@ -700,7 +700,7 @@ export const OrdersPage = () => {
                                 .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                                 .slice(0, 5)
                                 .map((event: any) => (
-                                  <p key={event.id} className={`text-[11px] ${isRoyal ? "text-white/65" : "text-zinc-600"}`}>
+                                  <p key={event.id} className={`text-[11px] ${isRoyal ? "text-zinc-600" : "text-zinc-600"}`}>
                                     {new Date(event.created_at).toLocaleString()} | {event.message}
                                   </p>
                                 ))}
