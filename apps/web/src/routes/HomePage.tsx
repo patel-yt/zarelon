@@ -791,10 +791,10 @@ export const HomePage = () => {
                         alt={product.title}
                         loading="lazy"
                         decoding="async"
-                        className="h-[92px] w-full object-cover"
+                        className="h-[92px] w-full bg-white object-contain p-1 md:h-[132px]"
                       />
                     ) : (
-                      <div className="grid h-[92px] place-items-center text-xs text-[#777777]">No image</div>
+                      <div className="grid h-[92px] place-items-center text-xs text-[#777777] md:h-[132px]">No image</div>
                     )}
                   </div>
                 </Link>

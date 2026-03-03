@@ -53,10 +53,10 @@ export const SpotlightSection = ({ title = "Spotlight", products, banner }: Spot
                   alt={product.title}
                   loading="lazy"
                   decoding="async"
-                  className="h-[72px] w-full object-cover shadow-[0_12px_24px_-16px_rgba(0,0,0,0.52)] transition duration-300 hover:shadow-[0_16px_30px_-14px_rgba(0,0,0,0.6)]"
+                  className="h-[84px] w-full bg-white object-contain p-1 shadow-[0_12px_24px_-16px_rgba(0,0,0,0.52)] transition duration-300 hover:shadow-[0_16px_30px_-14px_rgba(0,0,0,0.6)] md:h-[122px]"
                 />
               ) : (
-                <div className="grid h-[72px] place-items-center text-xs text-[#777777]">No image</div>
+                <div className="grid h-[84px] place-items-center text-xs text-[#777777] md:h-[122px]">No image</div>
               )}
             </div>
           </Link>
