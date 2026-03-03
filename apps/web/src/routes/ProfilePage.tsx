@@ -17,7 +17,13 @@ const titleCase = (value: string) =>
     .join(" ");
 
 const profileGlassyButtonClass =
-  "rounded-xl border border-[#d7c18a]/60 bg-gradient-to-br from-[#fff9ec] to-[#f4ead0] text-[#2a2110] shadow-[0_10px_24px_-16px_rgba(0,0,0,0.45)] backdrop-blur-md hover:border-[#c6a24b] hover:from-[#fff6e2] hover:to-[#f0e2bf]";
+  "rounded-xl border border-[#d7c18a] bg-[#fffdfa] text-[#2a2110] shadow-[0_10px_22px_-16px_rgba(0,0,0,0.35)] hover:border-[#b88a2c] hover:bg-[#fff8ea]";
+
+const profileLuxeCardClass =
+  "rounded-3xl border border-[#d9bf81]/70 bg-white p-6 text-[#111111] shadow-[0_20px_40px_-32px_rgba(0,0,0,0.45)]";
+
+const quickAccessTileClass =
+  "rounded-2xl border border-[#d8c28e] bg-[#fffdfa] px-4 py-4 text-left shadow-[0_10px_24px_-20px_rgba(0,0,0,0.4)] transition-all hover:border-[#b88a2c] hover:bg-[#fff8ea]";
 
 export const ProfilePage = () => {
   const { user, profile, refreshProfile } = useAuth();
@@ -96,29 +102,33 @@ export const ProfilePage = () => {
   });
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <div className="premium-luxe-card rounded-3xl border border-[#d6bf89]/55 bg-[linear-gradient(145deg,#fffdf7,#f6ecd3)] p-6 text-[#111111] shadow-[0_22px_50px_-28px_rgba(0,0,0,0.45)]">
+    <div className="mx-auto max-w-4xl space-y-6">
+      <div className={profileLuxeCardClass}>
         <h2 className="font-heading text-2xl text-[#111111]">Quick Access</h2>
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <Link to="/orders" className="rounded-2xl border border-[#d6bf89]/55 bg-white/85 p-4 text-sm font-semibold text-[#1f1a12] shadow-[0_10px_24px_-18px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-0.5 hover:border-[#c6a24b] hover:bg-[#fff8e8]">
-            Orders
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Link to="/orders" className={quickAccessTileClass}>
+            <p className="text-base font-semibold text-[#1f170b]">Orders</p>
+            <p className="mt-1 text-xs text-[#6b5a33]">Track and manage your orders</p>
           </Link>
-          <Link to="/wishlist" className="rounded-2xl border border-[#d6bf89]/55 bg-white/85 p-4 text-sm font-semibold text-[#1f1a12] shadow-[0_10px_24px_-18px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-0.5 hover:border-[#c6a24b] hover:bg-[#fff8e8]">
-            Wishlist
+          <Link to="/wishlist" className={quickAccessTileClass}>
+            <p className="text-base font-semibold text-[#1f170b]">Wishlist</p>
+            <p className="mt-1 text-xs text-[#6b5a33]">Saved products in one place</p>
           </Link>
-          <Link to="/earn-500-off" className="rounded-2xl border border-[#d6bf89]/55 bg-white/85 p-4 text-sm font-semibold text-[#1f1a12] shadow-[0_10px_24px_-18px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-0.5 hover:border-[#c6a24b] hover:bg-[#fff8e8]">
-            Coupons
+          <Link to="/earn-500-off" className={quickAccessTileClass}>
+            <p className="text-base font-semibold text-[#1f170b]">Coupons</p>
+            <p className="mt-1 text-xs text-[#6b5a33]">Available offers and rewards</p>
           </Link>
           <a
             href="mailto:support@zarelon.com?subject=ZARELON%20Support%20Request"
-            className="rounded-2xl border border-[#d6bf89]/55 bg-white/85 p-4 text-sm font-semibold text-[#1f1a12] shadow-[0_10px_24px_-18px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-0.5 hover:border-[#c6a24b] hover:bg-[#fff8e8]"
+            className={quickAccessTileClass}
           >
-            Customer Support
+            <p className="text-base font-semibold text-[#1f170b]">Customer Support</p>
+            <p className="mt-1 text-xs text-[#6b5a33]">Get help with account and orders</p>
           </a>
         </div>
       </div>
 
-      <div className="premium-luxe-card rounded-3xl border border-[#d6bf89]/55 bg-[linear-gradient(145deg,#fffefb,#f6edd8)] p-6 text-[#111111] shadow-[0_22px_50px_-28px_rgba(0,0,0,0.45)]">
+      <div className={profileLuxeCardClass}>
       <h1 className="mb-5 font-heading text-3xl text-[#111111]">Profile</h1>
       <div className="space-y-2 text-sm text-[#333333]">
         <p>Email: {profile?.email ?? user.email}</p>
@@ -165,7 +175,7 @@ export const ProfilePage = () => {
         Refresh Profile Sync
       </Button>
       </div>
-      <div className="premium-luxe-card rounded-3xl border border-[#d6bf89]/55 bg-[linear-gradient(145deg,#fffefb,#f6edd8)] p-6 text-[#111111] shadow-[0_22px_50px_-28px_rgba(0,0,0,0.45)]">
+      <div className={profileLuxeCardClass}>
         <h2 className="font-heading text-2xl text-[#111111]">Refund Payout Details</h2>
         <p className="mt-1 text-xs text-[#666666]">
           Add bank account and one UPI. Refund requests will include these details for faster processing.
