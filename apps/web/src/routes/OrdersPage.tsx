@@ -431,7 +431,7 @@ export const OrdersPage = () => {
   if (!user) return <div>Please sign in to view orders.</div>;
 
   return (
-    <div className="space-y-5 rounded-2xl border border-gold-400/15 bg-[radial-gradient(circle_at_top_right,rgba(212,175,55,0.13),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0))] p-4 sm:p-6">
+    <div className="space-y-5 rounded-2xl border border-white/40 bg-white p-4 text-white sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-heading text-3xl text-gold-200 sm:text-4xl">Order History</h1>
