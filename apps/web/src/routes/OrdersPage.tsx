@@ -557,7 +557,7 @@ export const OrdersPage = () => {
           </div>
 
           {!!order.order_items?.length ? (
-            <div className={`mt-3 rounded-xl border p-3.5 ${isRoyal ? "border-gold-400/70 bg-[#fffaf0] text-zinc-900 shadow-[inset_0_0_0_1px_rgba(212,175,55,0.18)]" : "border-zinc-200 bg-zinc-50"}`}>
+            <div className={`mt-3 rounded-xl border p-3.5 ${isRoyal ? "border-gold-400/80 bg-[linear-gradient(135deg,#fffaf0,#fff2cc)] text-zinc-900 shadow-[inset_0_0_0_1px_rgba(212,175,55,0.25)]" : "border-zinc-200 bg-zinc-50"}`}>
               <p className={`mb-2 text-xs uppercase tracking-wider ${isRoyal ? "text-zinc-700" : "text-zinc-500"}`}>Ordered Items</p>
               <div className="space-y-2">
                 {order.order_items.map((item: any) => {
@@ -574,7 +574,7 @@ export const OrdersPage = () => {
                   const activeRequest = Boolean(item?.active_request) || activeReturnStatuses.includes(openRequest?.status);
                   const permanentLock = refundLocked && exchangeLocked && !refundOverride && !exchangeOverride;
                   return (
-                    <div key={item.id} className={`rounded-lg border p-2.5 ${isRoyal ? "border-gold-300 bg-white text-zinc-900" : "border-zinc-200 bg-white"}`}>
+                    <div key={item.id} className={`rounded-lg border p-2.5 ${isRoyal ? "border-gold-400/70 bg-[#fffdf6] text-zinc-900" : "border-zinc-200 bg-white"}`}>
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <p className={`text-sm ${isRoyal ? "text-zinc-900" : "text-zinc-800"}`}>
                           {item.title_snapshot} x {item.quantity}
