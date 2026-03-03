@@ -98,6 +98,27 @@ export const ProfilePage = () => {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="premium-luxe-card rounded-2xl border border-black/10 bg-white p-6 text-[#111111] shadow-[0_12px_28px_-20px_rgba(0,0,0,0.35)]">
+        <h2 className="font-heading text-2xl text-[#111111]">Quick Access</h2>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <Link to="/orders" className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]">
+            Orders
+          </Link>
+          <Link to="/wishlist" className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]">
+            Wishlist
+          </Link>
+          <Link to="/earn-500-off" className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]">
+            Coupons
+          </Link>
+          <a
+            href="mailto:support@zarelon.com?subject=ZARELON%20Support%20Request"
+            className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]"
+          >
+            Customer Support
+          </a>
+        </div>
+      </div>
+
+      <div className="premium-luxe-card rounded-2xl border border-black/10 bg-white p-6 text-[#111111] shadow-[0_12px_28px_-20px_rgba(0,0,0,0.35)]">
       <h1 className="mb-5 font-heading text-3xl text-[#111111]">Profile</h1>
       <div className="space-y-2 text-sm text-[#333333]">
         <p>Email: {profile?.email ?? user.email}</p>
@@ -144,27 +165,6 @@ export const ProfilePage = () => {
         Refresh Profile Sync
       </Button>
       </div>
-      <div className="premium-luxe-card rounded-2xl border border-black/10 bg-white p-6 text-[#111111] shadow-[0_12px_28px_-20px_rgba(0,0,0,0.35)]">
-        <h2 className="font-heading text-2xl text-[#111111]">Quick Access</h2>
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <Link to="/orders" className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]">
-            Orders
-          </Link>
-          <Link to="/wishlist" className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]">
-            Wishlist
-          </Link>
-          <Link to="/earn-500-off" className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]">
-            Coupons
-          </Link>
-          <a
-            href="mailto:support@zarelon.com?subject=ZARELON%20Support%20Request"
-            className="rounded-xl border border-black/15 bg-white p-4 text-sm font-semibold text-[#111111]"
-          >
-            Customer Support
-          </a>
-        </div>
-      </div>
-
       <div className="premium-luxe-card rounded-2xl border border-black/10 bg-white p-6 text-[#111111] shadow-[0_12px_28px_-20px_rgba(0,0,0,0.35)]">
         <h2 className="font-heading text-2xl text-[#111111]">Refund Payout Details</h2>
         <p className="mt-1 text-xs text-[#666666]">
