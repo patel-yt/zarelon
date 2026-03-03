@@ -157,6 +157,8 @@ export const OrdersPage = () => {
   const [confirmReturnRequest, setConfirmReturnRequest] = useState(false);
   const [showPickupAddressForm, setShowPickupAddressForm] = useState(false);
   const [detailsOrderId, setDetailsOrderId] = useState<string | null>(null);
+  const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "confirmed" | "shipped" | "delivered" | "cancelled" | "refunded">("all");
   const [pickupAddressForm, setPickupAddressForm] = useState({
     label: "Pickup",
     fullName: "",
@@ -381,6 +383,23 @@ export const OrdersPage = () => {
   );
   const hasUpiPayout = Boolean(payoutQuery.data?.upi_id);
 
+  const filteredOrders = useMemo(() => {
+    const source = query.data ?? [];
+    const q = searchText.trim().toLowerCase();
+    return source.filter((order: any) => {
+      if (statusFilter !== "all" && order.status !== statusFilter) return false;
+      if (!q) return true;
+      const inOrderNumber = String(order.order_number ?? "").toLowerCase().includes(q);
+      const inStatus = String(order.status ?? "").toLowerCase().includes(q);
+      const inItems = (order.order_items ?? []).some((item: any) =>
+        String(item?.title_snapshot ?? "")
+          .toLowerCase()
+          .includes(q)
+      );
+      return inOrderNumber || inItems || inStatus;
+    });
+  }, [query.data, searchText, statusFilter]);
+
   useEffect(() => {
     if (!returnModalOrderId) return;
     if (pickupAddressId) return;
@@ -473,7 +492,30 @@ export const OrdersPage = () => {
       {refundError ? <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">{refundError}</p> : null}
       {returnMessage ? <p className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">{returnMessage}</p> : null}
       {returnError ? <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">{returnError}</p> : null}
-      {(query.data ?? []).map((order) => {
+      <div className="sticky top-[70px] z-20 rounded-xl border border-zinc-300 bg-white/95 p-2 backdrop-blur sm:top-[84px]">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_180px]">
+          <input
+            value={searchText}
+            onChange={(event) => setSearchText(event.target.value)}
+            placeholder="Search order number or product"
+            className="h-10 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-800 outline-none focus:border-gold-400"
+          />
+          <select
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value as any)}
+            className="h-10 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-800 outline-none focus:border-gold-400"
+          >
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="refunded">Refunded</option>
+          </select>
+        </div>
+      </div>
+      {filteredOrders.map((order) => {
         const delivery = getDeliveryCommitment(order);
         const isRoyal = delivery.fast;
         return (
@@ -997,7 +1039,7 @@ export const OrdersPage = () => {
         </div>
       );
       })}
-      {!query.data?.length && <p className="text-sm text-[#555555]">No orders yet.</p>}
+      {!filteredOrders.length && <p className="text-sm text-[#555555]">No orders found.</p>}
 
       {returnModalOrderId && selectedReturnItem ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 px-4">
