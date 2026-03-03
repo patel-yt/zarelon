@@ -188,9 +188,6 @@ export const OrdersPage = () => {
       setReturnError((error as Error).message ?? "Could not save pickup address.");
     },
   });
-  const invoiceMutation = useMutation({
-    mutationFn: (orderId: string) => ordersApi.downloadInvoice(orderId),
-  });
   const cancelMutation = useMutation({
     mutationFn: ({ orderId, reason }: { orderId: string; reason?: string }) => ordersApi.cancelOrder(orderId, reason),
     onMutate: () => {
@@ -475,14 +472,6 @@ export const OrdersPage = () => {
           </div>
           <div className="mt-3">
             <div className="flex flex-wrap gap-2">
-              <Button
-                variant="ghost"
-                className="px-3 py-1 text-xs"
-                onClick={() => invoiceMutation.mutate(order.id)}
-                disabled={invoiceMutation.isPending}
-              >
-                {invoiceMutation.isPending ? "Preparing Invoice..." : "Download Invoice"}
-              </Button>
               {(order.status === "pending" || order.status === "confirmed") && (
                 <Button
                   variant="ghost"
